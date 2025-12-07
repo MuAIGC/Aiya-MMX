@@ -1,0 +1,913 @@
+{
+  "id": "07fd3352-11ca-4df8-bebb-45432c155e4d",
+  "revision": 0,
+  "last_node_id": 81,
+  "last_link_id": 103,
+  "nodes": [
+    {
+      "id": 52,
+      "type": "CLIPLoader",
+      "pos": [
+        4765.993136012411,
+        817.9950524876516
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "CLIP",
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            73
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "CLIPLoader",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "qwen_3_4b.safetensors",
+        "qwen_image",
+        "default"
+      ]
+    },
+    {
+      "id": 55,
+      "type": "UNETLoader",
+      "pos": [
+        4762.187532985067,
+        685.7833139012258
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            74
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "UNETLoader",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "z_image_turbo_bf16.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 57,
+      "type": "CLIPTextEncode",
+      "pos": [
+        5055.231222708399,
+        692.2235805095715
+      ],
+      "size": [
+        210,
+        127
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 73
+        },
+        {
+          "label": "text",
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 94
+        }
+      ],
+      "outputs": [
+        {
+          "label": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            70,
+            75
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "CLIPTextEncode",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 54,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        5321.343679235504,
+        682.6920798694958
+      ],
+      "size": [
+        197.712890625,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "conditioning",
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 70
+        }
+      ],
+      "outputs": [
+        {
+          "label": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            76
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "ConditioningZeroOut",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 58,
+      "type": "KSampler",
+      "pos": [
+        5327.763441100353,
+        778.311561119028
+      ],
+      "size": [
+        278.4819641113281,
+        317.6039123535156
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 74
+        },
+        {
+          "label": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 75
+        },
+        {
+          "label": "negative",
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 76
+        },
+        {
+          "label": "latent_image",
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 95
+        }
+      ],
+      "outputs": [
+        {
+          "label": "LATENT",
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            71
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "KSampler",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        410404511511220,
+        "randomize",
+        9,
+        1,
+        "res_multistep",
+        "simple",
+        1
+      ]
+    },
+    {
+      "id": 64,
+      "type": "MarkdownNote",
+      "pos": [
+        2267.2703299752966,
+        365.34592897019394
+      ],
+      "size": [
+        346.4853484271465,
+        88
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "无水印保存\n--\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 63,
+      "type": "MarkdownNote",
+      "pos": [
+        1755.6366969982923,
+        407.3689236754
+      ],
+      "size": [
+        346.4853484271465,
+        88
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "输入提示词，可以中文\n--\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 24,
+      "type": "MarkdownNote",
+      "pos": [
+        1721.9511853573472,
+        976.5753934983022
+      ],
+      "size": [
+        421.7486539434984,
+        280.05862266290023
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "🌊 A-Starsea Prompt & Resolution使用说明",
+      "properties": {},
+      "widgets_values": [
+        "【示例用法】\n--\n选择 \"1:1 (Square)\"，宽度输入1024 → 高度自动计算为1024\n\n选择 \"16:9 (Widescreen)\"，宽度输入1920 → 高度自动计算为1080\n\n选择 \"Custom\" → 可以自由设置任何宽度和高度组合"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 53,
+      "type": "VAELoader",
+      "pos": [
+        4765.990999781942,
+        979.2785455296442
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "VAE",
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            72
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "VAELoader",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "ae.safetensors"
+      ]
+    },
+    {
+      "id": 75,
+      "type": "MMXSimplePromptResolution",
+      "pos": [
+        1716.827932635804,
+        556.9164919215922
+      ],
+      "size": [
+        416.5869060653554,
+        336.7360355595516
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            94
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            95
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MMXSimplePromptResolution"
+      },
+      "widgets_values": [
+        "这张图片构图以3D艺术字\"Z-image文生图\"为中心，柔和的自然光从斜上方洒落，形成斑驳的光影效果。浅粉色系的蔷薇与白色小花组成的花束环绕在周围，部分花瓣飞舞营造出朦胧浪漫的氛围。画面四角是暗色系的，凸显出中间的文字，整体色调温暖柔和，呈现出细腻的胶片质感。0",
+        "Custom",
+        1024,
+        1024,
+        1
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 56,
+      "type": "VAEDecode",
+      "pos": [
+        5712.048837592328,
+        802.889515886129
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "samples",
+          "name": "samples",
+          "type": "LATENT",
+          "link": 71
+        },
+        {
+          "label": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 72
+        }
+      ],
+      "outputs": [
+        {
+          "label": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            96
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "VAEDecode",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 76,
+      "type": "ImageSaveJPG",
+      "pos": [
+        2249.235222018022,
+        539.3801781577097
+      ],
+      "size": [
+        390.24808929287565,
+        545.4175243521374
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 97
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": [
+            98
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageSaveJPG"
+      },
+      "widgets_values": [
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img-Aiya-",
+        95,
+        true,
+        false,
+        true
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 65,
+      "type": "MarkdownNote",
+      "pos": [
+        2781.8666951874884,
+        149.50261952499028
+      ],
+      "size": [
+        346.4853484271465,
+        88
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "有水印保存\n--\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 77,
+      "type": "Reroute",
+      "pos": [
+        2612.2315848233084,
+        57.12321803712693
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 96
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "IMAGE",
+          "links": [
+            97,
+            102
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 81,
+      "type": "MMXImageWatermarkStable",
+      "pos": [
+        2789.4882245025437,
+        306.56513051128564
+      ],
+      "size": [
+        270,
+        174
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "图像",
+          "type": "IMAGE",
+          "link": 102
+        }
+      ],
+      "outputs": [
+        {
+          "name": "图像",
+          "type": "IMAGE",
+          "links": [
+            103
+          ]
+        },
+        {
+          "name": "刷新回弹",
+          "type": "BOOLEAN",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MMXImageWatermarkStable"
+      },
+      "widgets_values": [
+        "左上",
+        1,
+        0.02,
+        "Z-img-MMX_ico-600x600",
+        false
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 66,
+      "type": "MarkdownNote",
+      "pos": [
+        3204.270893096035,
+        386.34273703026804
+      ],
+      "size": [
+        985.2213589486523,
+        848.0549669530701
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "使用说明",
+      "properties": {},
+      "widgets_values": [
+        "# Save Image as JPG 使用说明书\n\n## 一、节点定位\n- **作用**：一键保存 JPG，**自动按日期落盘**，同时把当时使用的正向提示词写成同名的 `.txt` 文件，方便日后回溯。\n\n---\n\n## 二、端口速览\n| 端口 | 类型 | 说明 |\n|---|---|---|\n| images | IMAGE | 要保存的图片（支持批量） |\n| filename_prefix | STRING | **核心控制字段**——路径+文件名模板，可插 **%date:变量%** 自动按天归档；留空=ComfyUI |\n| quality | INT | JPG 质量 1-100（默认 95） |\n| optimize | BOOLEAN | 额外压缩优化，体积↓5-15%，耗时↑（默认开） |\n| progressive | BOOLEAN | 渐进式 JPG，网页大图“先模糊后清晰”，老设备可能不兼容（默认关） |\n| save_prompt_as_txt | BOOLEAN | 是否同步写同路径 `*_prompt.txt`（默认开） |\n\n**输出**  \n| prompt_text | STRING | 纯文本提示词，可继续接「保存文本」「展示文本」等下游节点 |\n\n---\n\n## 三、日期变量语法（大小写敏感）\n在 **filename_prefix** 里直接写即可，出现 `/` 会自动建多级目录。\n\n| 用户变量 | 对应 Python 格式 | 示例输出（2025-12-06 14:30:25） |\n|---|---|---|\n| %date:yyyy% | %Y | 2025 |\n| %date:MM% | %m | 12 |\n| %date:dd% | %d | 06 |\n| %date:HH% | %H | 14（24h） |\n| %date:hh% | %I | 02（12h） |\n| %date:mm% | %M | 30 |\n| %date:ss% | %S | 25 |\n| **组合** |\n| %date:yyyyMMdd% | %Y%m%d | 20251206 |\n| %date:yyyy-MM-dd% | %Y-%m-%d | 2025-12-06 |\n| %date:yyyy/MM/dd% | %Y/%m/%d | 2025/12/06 |\n| %date:yyyyMMddHHmmss% | %Y%m%d%H%M%S | 20251206143025 |\n| %date:HH-mm-ss% | %H-%M-%S | 14-30-25 |\n\n**例子 1**（每天一个文件夹）  \n```\n%date:yyyy-MM-dd%/img\n```\n→ 保存到  \n```\nComfyUI/output/2025-12-06/img_00001.jpg  \nComfyUI/output/2025-12-06/img_00002.jpg\n```\n\n**例子 2**（日期两级目录 + 日期文件名）  \n```\n%date:yyyyMMdd%/%date:yyyyMMdd%_Z_img-\n```\n→  \n```\nComfyUI/output/20251206/20251206_Z_img-_00001.jpg\n```\n\n**例子 3**（年月分文件夹）  \n```\n旅行/%date:yyyy%/12月/%date:MMdd%_\n```\n→  \n```\nComfyUI/output/旅行/2025/12月/1206_00001.jpg\n```\n\n---\n\n## 四、提示词存档\n只要 `save_prompt_as_txt = True`（默认开），每次保存 JPG 时会**同路径**生成：\n\n```\n<图片名>_prompt.txt\n```\n\n内容仅含你在 **A_StarseaSimplePromptResolution** 节点里写的正向提示词，方便后期全文搜索或导入其他工具。\n\n---\n\n## 五、快速起步\n1. 拖节点 → 连图像  \n2. filename_prefix 填：\n```\n%date:yyyy-MM-dd%/img\n```\n3. Queue → 完工  \n   文件自动进 `output/2025-12-06/img_00001.jpg` + `img_00001_prompt.txt`\n\n---\n\n## 六、常见疑问\n**Q1 变量大小写？**  \n必须严格 `yyyy MM dd HH hh mm ss`，`YYYY` 或 `DD` 不会被替换。\n\n**Q2 可以混用其他变量吗？**  \n可以！先写日期变量，再拼接 `%width%`、`_batch_` 等你自己的字符串，只要最终字符串里出现 `/` 就会按目录落盘。\n\n**Q3 老照片想批量归档？**  \n把 `filename_prefix` 一次性改成 `%date:yyyyMMdd%/` 并连「批量生成」→ 每天一个文件夹，再也不用手动整理。\n\n---\n\n## 七、节点输出再利用\n- `prompt_text` 端口返回纯文本，可接：  \n  - **Show Text|pysssss** → 实时预览  \n  - **Save Text** → 落盘独立 txt/md  \n  - **字符串拼接/替换** → 做模板、批量封面、自动化报告\n\n---\n\n**一句话**：日期变量 + 提示词存档 = 每天跑图零整理，回找提示词 1 秒搞定。"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 79,
+      "type": "ImageSaveJPG",
+      "pos": [
+        2737.225924235656,
+        537.2030864029749
+      ],
+      "size": [
+        390.24808929287565,
+        545.4175243521374
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 103
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": [
+            101
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageSaveJPG"
+      },
+      "widgets_values": [
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img-Aiya-",
+        95,
+        true,
+        false,
+        true
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 78,
+      "type": "PreviewAny",
+      "pos": [
+        2268.7199109465037,
+        1150.090071083598
+      ],
+      "size": [
+        363.92354250067046,
+        145.66511476614232
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 98
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 80,
+      "type": "PreviewAny",
+      "pos": [
+        2747.5877515540797,
+        1157.0358093018654
+      ],
+      "size": [
+        378.0224069040305,
+        130.73685328978559
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 101
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": []
+    }
+  ],
+  "links": [
+    [
+      70,
+      57,
+      0,
+      54,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      71,
+      58,
+      0,
+      56,
+      0,
+      "LATENT"
+    ],
+    [
+      72,
+      53,
+      0,
+      56,
+      1,
+      "VAE"
+    ],
+    [
+      73,
+      52,
+      0,
+      57,
+      0,
+      "CLIP"
+    ],
+    [
+      74,
+      55,
+      0,
+      58,
+      0,
+      "MODEL"
+    ],
+    [
+      75,
+      57,
+      0,
+      58,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      76,
+      54,
+      0,
+      58,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      94,
+      75,
+      0,
+      57,
+      1,
+      "STRING"
+    ],
+    [
+      95,
+      75,
+      3,
+      58,
+      3,
+      "LATENT"
+    ],
+    [
+      96,
+      56,
+      0,
+      77,
+      0,
+      "*"
+    ],
+    [
+      97,
+      77,
+      0,
+      76,
+      0,
+      "IMAGE"
+    ],
+    [
+      98,
+      76,
+      0,
+      78,
+      0,
+      "*"
+    ],
+    [
+      101,
+      79,
+      0,
+      80,
+      0,
+      "*"
+    ],
+    [
+      102,
+      77,
+      0,
+      81,
+      0,
+      "IMAGE"
+    ],
+    [
+      103,
+      81,
+      0,
+      79,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.1671841070450024,
+      "offset": [
+        -1540.7552445944584,
+        -297.43584929773544
+      ]
+    },
+    "frontendVersion": "1.33.10",
+    "links_added_by_ue": [],
+    "VHS_KeepIntermediate": true,
+    "ue_links": [],
+    "VHS_MetadataImage": true,
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "VHS_latentpreviewrate": 0,
+    "VHS_latentpreview": false,
+    "workflowRendererVersion": "LG"
+  },
+  "version": 0.4
+}
