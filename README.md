@@ -1,13 +1,8 @@
-给你一份「少女风」配色 + 徽章 + 居中排版的 README，直接复制即可生效。
-
-```markdown
 <p align="center">
   <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/MMXlab-600x600.jpg" width="280"/>
 </p>
 
-<h1 align="center">
-  <span style="color:#ff7eb9;">💕</span> ComfyUI-Aiya-MMX <span style="color:#ff7eb9;">💕</span>
-</h1>
+<h1 align="center">💕 ComfyUI-Aiya-MMX 💕</h1>
 
 <p align="center">
   <b>一键加水印 · 调尺寸 · 保存 · 抽卡</b><br>
@@ -15,12 +10,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/ComfyUI-★★★★★-ff7eb9?style=flat-square"/>
-  <img src="https://img.shields.io/badge/Python-3.8+-ff7eb9?style=flat-square"/>
-  <img src="https://img.shields.io/badge/License-MIT-ff7eb9?style=flat-square"/>
-  <img src="https://img.shields.io/badge/Platform-Linux%20%7C%20Win%20%7C%20macOS-ff7eb9?style=flat-square"/>
+  <img src="https://img.shields.io/badge/ComfyUI-★★★★★-FF7EB9?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Python-3.8+-FF7EB9?style=flat-square"/>
+  <img src="https://img.shields.io/badge/License-MIT-FF7EB9?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Platform-Linux%7CWin%7CmacOS-FF7EB9?style=flat-square"/>
 </p>
-```
 
 ---
 
