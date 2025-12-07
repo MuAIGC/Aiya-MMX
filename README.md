@@ -78,7 +78,7 @@ ComfyUI-Aiya-MMX/
   ./sync.sh
   ```
 - **Issue / PR**：欢迎到 [GitHub 仓库](https://github.com/MuAIGC/ComfyUI-Aiya-MMX) 提需求  
-- **QQ 群**：搜索「哎呀AI」随时吹水
+- **微信群**：微信号 MMXaigc
 
 ---
 
