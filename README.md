@@ -79,6 +79,10 @@ ComfyUI-Aiya-MMX/
   ```
 - **Issue / PR**：欢迎到 [GitHub 仓库](https://github.com/MuAIGC/ComfyUI-Aiya-MMX) 提需求  
 - **微信群**：微信号 MMXaigc
+<div align="center">
+  <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/MMXlab-600x600.jpg" alt="MMX Lab" width="300"/>
+</div>
+```
 
 ---
 
