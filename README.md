@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/blob/main/ComfyUI-Aiya-MMX-B.jpg" width="600"/>
+  <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/blob/main/ComfyUI-Aiya-MMX-B.jpg" width="900"/>
 </p>
 
 <h1 align="center">💕 ComfyUI-Aiya-MMX 💕</h1>
