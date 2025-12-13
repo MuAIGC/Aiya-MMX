@@ -43,12 +43,23 @@ class NanoBanana2_DMX:
         "English: DMX-native auto txt/img2img / 14 imgs / 1K・2K・4K / fallback."
     )
 
+    # 1. 预置默认 endpoint，想改只改这一行 -----------------------------
+    DEFAULT_ENDPOINT = "https://www.dmxapi.cn/v1/images/generations"
+
+    # 2. 或者让节点每次启动时读取同目录下的 banana_endpoint.txt
+    #    需要就取消下面注释 ---------------------------------------------
+    # try:
+    #     with open(os.path.join(os.path.dirname(__file__), "banana_endpoint.txt"), encoding="utf-8") as f:
+    #         DEFAULT_ENDPOINT = f.read().strip()
+    # except Exception:
+    #     pass
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "endpoint_url": ("STRING", {
-                    "default": "",
+                    "default": cls.DEFAULT_ENDPOINT,          # ← 预置默认值
                     "placeholder": "https://www.dmxapi.cn/v1/images/(generations|edits)"
                 }),
                 "api_key": ("STRING", {
