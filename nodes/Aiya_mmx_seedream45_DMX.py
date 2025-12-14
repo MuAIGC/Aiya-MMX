@@ -67,10 +67,7 @@ RECOMMENDED_SIZE = {
 class SeeDream4_5_DMX:
     DESCRIPTION = (
         "💕 哎呀✦MMX SeeDream4.5（10图）\n\n"
-        "官方 JSON + image[]（URL/Base64）方式，与示例完全一致\n"
-        "四件套：清晰度 / 比例 / 网址 / key  \n"
-        "运行日志打印完整参数，9:16 已对齐\n\n"
-        "English: DMX-native doubao-seedream-4-5-251128 official JSON+image[] / 10 imgs / full logs"
+        "English: DMX-native doubao-seedream-4-5-251128 / 10 imgs / full logs"
     )
 
     @classmethod
