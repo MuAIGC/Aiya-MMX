@@ -1,8 +1,3 @@
-"""
-💕 哎呀✦MMX NanoBanana2-DMX 全自动节点
-无图=文生图(/generations)  有图=图生图(/edits)
-1K/2K/4K | 官方宽高比 | 自动降级 | 无保存选项
-"""
 from __future__ import annotations
 import io
 import requests
@@ -37,29 +32,23 @@ def pil2tensor(img: Image.Image):
 # ---------- 节点 ----------
 class NanoBanana2_DMX:
     DESCRIPTION = (
-        "💕 哎呀✦NanoBanana2-DMX 全自动节点\n\n"
-        "自动识别：无图走文生图(/generations)，有图走图生图(/edits)\n"
-        "字段与 DMXAPI 官方 1:1 映射，支持 1K/2K/4K\n\n"
-        "English: DMX-native auto txt/img2img / 14 imgs / 1K・2K・4K / fallback."
+        "💕 哎呀✦NanoBanana2-DMX 一键出图\n\n"
+        "无图 = 文生图 (/generations)  |  有图 = 图生图 (/edits)\n"
+        "模型：nano-banana-2  |  最多 14 张参考图\n"
+        "分辨率：1K / 2K / 4K  |  宽高比：1:1 ~ 21:9\n"
+        "字段与官方 1:1 映射，自动降级，免保存配置\n\n"
+        "English: Auto txt|img2img, 14 imgs, 1-4K, fallback on error."
     )
 
     # 1. 预置默认 endpoint，想改只改这一行 -----------------------------
     DEFAULT_ENDPOINT = "https://www.dmxapi.cn/v1/images/generations"
-
-    # 2. 或者让节点每次启动时读取同目录下的 banana_endpoint.txt
-    #    需要就取消下面注释 ---------------------------------------------
-    # try:
-    #     with open(os.path.join(os.path.dirname(__file__), "banana_endpoint.txt"), encoding="utf-8") as f:
-    #         DEFAULT_ENDPOINT = f.read().strip()
-    # except Exception:
-    #     pass
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "endpoint_url": ("STRING", {
-                    "default": cls.DEFAULT_ENDPOINT,          # ← 预置默认值
+                    "default": cls.DEFAULT_ENDPOINT,
                     "placeholder": "https://www.dmxapi.cn/v1/images/(generations|edits)"
                 }),
                 "api_key": ("STRING", {
@@ -141,31 +130,59 @@ class NanoBanana2_DMX:
         return images
 
     def call_api(self, url, key, ar, size, **kwargs):
-        """带降级的一次封装"""
+        """温柔重试：300 s 超时，最多 3 次，503/5xx/超时都重试"""
         headers = {"Authorization": f"Bearer {key}"}
-        # 第一次：完整参数
-        if "json" in kwargs:
-            headers["Content-Type"] = "application/json"
-            resp = requests.post(url, headers=headers, json=kwargs["json"], timeout=180)
-        else:
-            resp = requests.post(url, headers=headers, data=kwargs["data"], files=kwargs["files"], timeout=180)
+        max_retry = 3
+        for attempt in range(1, max_retry + 1):
+            try:
+                print(f"[NanoBanana2-DMX] 第 {attempt}/{max_retry} 次请求中… 请再等等我哦~")
+                if "json" in kwargs:
+                    headers["Content-Type"] = "application/json"
+                    resp = requests.post(url, headers=headers, json=kwargs["json"], timeout=300)
+                else:
+                    resp = requests.post(url, headers=headers, data=kwargs["data"],
+                                         files=kwargs["files"], timeout=300)
 
-        if resp.status_code == 200:
-            return resp
-        # 识别 rix 错误
-        if "rix_api_error" in resp.text and "bad_response_status_code" in resp.text:
-            print("[NanoBanana2-DMX] 后端不支持当前分辨率，自动降级重试…")
-            if "json" in kwargs:
-                payload = kwargs["json"].copy()
-                payload.pop("aspect_ratio", None)
-                payload.pop("size", None)
-                return requests.post(url, headers=headers, json=payload, timeout=180)
-            else:
-                data = kwargs["data"].copy()
-                data.pop("aspect_ratio", None)
-                data.pop("size", None)
-                return requests.post(url, headers=headers, data=data, files=kwargs["files"], timeout=180)
-        return resp
+                # 503/5xx 重试
+                if 500 <= resp.status_code < 600:
+                    print(f"[NanoBanana2-DMX] 服务器开小差 ({resp.status_code})，{(2 ** attempt)} 秒后重试…")
+                    time.sleep(2 ** attempt)
+                    continue
+
+                # rix 限流降级
+                if "rix_api_error" in resp.text and "bad_response_status_code" in resp.text:
+                    print("[NanoBanana2-DMX] 后端限流，自动降级（去掉 aspect_ratio & size）重试…")
+                    if "json" in kwargs:
+                        payload = kwargs["json"].copy()
+                        payload.pop("aspect_ratio", None)
+                        payload.pop("size", None)
+                        resp = requests.post(url, headers=headers, json=payload, timeout=300)
+                    else:
+                        data = kwargs["data"].copy()
+                        data.pop("aspect_ratio", None)
+                        data.pop("size", None)
+                        resp = requests.post(url, headers=headers, data=data,
+                                             files=kwargs["files"], timeout=300)
+                return resp
+
+            except requests.exceptions.Timeout:
+                print(f"[NanoBanana2-DMX] 请求超时 (>300 s)，别急，我再试试…（{attempt}/{max_retry}）")
+                if attempt < max_retry:
+                    time.sleep(5)
+                continue
+            except requests.exceptions.RequestException as e:
+                print(f"[NanoBanana2-DMX] 网络波动：{e}，{attempt}/{max_retry} 次")
+                if attempt < max_retry:
+                    time.sleep(5)
+                continue
+
+        # 温柔地抛异常
+        raise RuntimeError(
+            "[NanoBanana2-DMX] 我已经很努力啦，可服务器还是木有响应～\n"
+            "1. 高峰时段生成较慢，请 3~5 分钟后再试；\n"
+            "2. 检查 API 额度是否充足；\n"
+            "3. 调低清晰度（4K→2K）或减少参考图数量再试试～"
+        )
 
     # ---------- 主入口 ----------
     def generate(self, endpoint_url, api_key, prompt, aspect_ratio, size, **img_ports):
@@ -197,6 +214,4 @@ class NanoBanana2_DMX:
                f"input: {cnt}  output: {len(images)}")
         return (pil2tensor(best), txt)
 
-
-# ---------- 注册 ----------
 register_node(NanoBanana2_DMX, "NanoBanana_Pro_DMX")
