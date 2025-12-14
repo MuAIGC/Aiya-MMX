@@ -1,0 +1,6 @@
+requests
+
+aiohttp
+aiofiles
+
+opencv-python
