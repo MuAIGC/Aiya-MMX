@@ -1,0 +1,1586 @@
+{
+  "id": "9712da5a-170e-4496-930f-7c7228e614e8",
+  "revision": 0,
+  "last_node_id": 84,
+  "last_link_id": 156,
+  "nodes": [
+    {
+      "id": 16,
+      "type": "DownloadVideo",
+      "pos": [
+        156.21753958245165,
+        2996.185793795536
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 25,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "download_url",
+          "type": "STRING",
+          "widget": {
+            "name": "download_url"
+          },
+          "link": 156
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            21,
+            27
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DownloadVideo"
+      },
+      "widgets_values": [
+        "",
+        "%Aiya:yyyyMMdd%",
+        300
+      ]
+    },
+    {
+      "id": 25,
+      "type": "SaveVideo",
+      "pos": [
+        637.6331361084394,
+        3357.905471110998
+      ],
+      "size": [
+        270,
+        249.80087847730624
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 28,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 28
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "PreviewAny",
+      "pos": [
+        1015.5283143075372,
+        3534.572208469402
+      ],
+      "size": [
+        470.9425799993521,
+        112
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 30,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 24
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 23,
+      "type": "PreviewAny",
+      "pos": [
+        1016.9539219071944,
+        3702.0454028021563
+      ],
+      "size": [
+        467.17282339159647,
+        112
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 31,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 25
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 24,
+      "type": "SaveVideo",
+      "pos": [
+        631.6228386551469,
+        2984.2878417805628
+      ],
+      "size": [
+        270,
+        249.80087847730624
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 27,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 27
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 21,
+      "type": "PreviewAny",
+      "pos": [
+        1007.9680837878257,
+        3377.599593209659
+      ],
+      "size": [
+        470.9426950431937,
+        112
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 29,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 23
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 19,
+      "type": "AiyaMMXVideoToPath",
+      "pos": [
+        156.0613701507133,
+        3411.313866786881
+      ],
+      "size": [
+        279.808203125,
+        118
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 26,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            28
+          ]
+        },
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": [
+            23
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            24
+          ]
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            25
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AiyaMMXVideoToPath"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 28,
+      "type": "MarkdownNote",
+      "pos": [
+        -917.7237211775466,
+        1909.7473226609702
+      ],
+      "size": [
+        410.70184179689704,
+        347.9087855968014
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "说明",
+      "properties": {},
+      "widgets_values": [
+        "# 【第一步】 填/注册API\n---\n## 可以使用DMX-API\n\n## [>>点这里获取key<<](https://www.dmxapi.cn/register?aff=LpUa/)\n\n## 令牌->添加令牌->获得key\n\n## ->将key填入下框->确认"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 27,
+      "type": "MarkdownNote",
+      "pos": [
+        -452.0952797730671,
+        1910.7507399959425
+      ],
+      "size": [
+        385.61418813396176,
+        254.58251337908882
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "说明",
+      "properties": {},
+      "widgets_values": [
+        "# 【第二步】 选择玩法\n---\n## 这个开关，每次跑图建议，只打开一个“yes”，不然开几个跑几次图"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 39,
+      "type": "LoadImage",
+      "pos": [
+        179.3686906535935,
+        1170.024586201083
+      ],
+      "size": [
+        326.2036230531095,
+        326
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 2,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            118
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "20250803152343-wan22-_00004_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 65,
+      "type": "Reroute",
+      "pos": [
+        283.15406342141597,
+        726.2760895928855
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 11,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "widget": {
+            "name": "value"
+          },
+          "link": 123
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "STRING",
+          "links": [
+            137
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 11,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        65.27116873252828,
+        344.3290782867528
+      ],
+      "size": [
+        339.6839230368738,
+        201.5078796343339
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 3,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            136
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "橘猫摊主，赛博菜市场，像素鱼干一闪，猫爪按下按钮，弹出‘MMX’标签，世界瞬间静音。"
+      ]
+    },
+    {
+      "id": 72,
+      "type": "AiyaHailuo23DMX",
+      "pos": [
+        513.5858066510037,
+        398.4541688296613
+      ],
+      "size": [
+        318.6294921875,
+        270
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 14,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 136
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 137
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            139
+          ]
+        },
+        {
+          "name": "download_url",
+          "type": "STRING",
+          "links": [
+            138
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AiyaHailuo23DMX"
+      },
+      "widgets_values": [
+        "",
+        "6",
+        "768P",
+        241846501215234,
+        "randomize",
+        "开启",
+        "关闭",
+        "关闭",
+        "[变焦推近]"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "SaveVideo",
+      "pos": [
+        1036.9465141547407,
+        271.03484431947874
+      ],
+      "size": [
+        374,
+        334.7690965334009
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 18,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 139
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 69,
+      "type": "Reroute",
+      "pos": [
+        907.4219216230741,
+        650.3000877612906
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 19,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 138
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "STRING",
+          "links": [
+            129
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 26,
+      "type": "PreviewAny",
+      "pos": [
+        1098.72365855558,
+        657.7496986124944
+      ],
+      "size": [
+        272.9777243841356,
+        147.57904638582477
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 23,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 129
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 42,
+      "type": "Reroute",
+      "pos": [
+        429.205934955522,
+        1514.2068325283076
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 10,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "widget": {
+            "name": "value"
+          },
+          "link": 49
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "STRING",
+          "links": [
+            120
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 34,
+      "type": "PreviewAny",
+      "pos": [
+        1220.5874472201185,
+        1571.754556528107
+      ],
+      "size": [
+        272.9777243841356,
+        147.57904638582477
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 22,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 116
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 59,
+      "type": "Reroute",
+      "pos": [
+        679.5041073969975,
+        1594.226423638415
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 17,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 122
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "STRING",
+          "links": [
+            116
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 35,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        185.59121750560038,
+        1600.331354204391
+      ],
+      "size": [
+        333.40717090722217,
+        88
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 4,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            117
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "女人走进了昆仑墟，到处是闪着金光的仙草鲜花"
+      ]
+    },
+    {
+      "id": 36,
+      "type": "SaveVideo",
+      "pos": [
+        912.0112381762085,
+        1170.3757278908492
+      ],
+      "size": [
+        272.8273864821215,
+        458.9278967003066
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 16,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 119
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 74,
+      "type": "Reroute",
+      "pos": [
+        232.49579431948703,
+        2380.5858089139974
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "widget": {
+            "name": "value"
+          },
+          "link": 140
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "STRING",
+          "links": [
+            155
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 77,
+      "type": "Reroute",
+      "pos": [
+        1034.0694878820364,
+        2354.2982176678656
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "widget": {
+            "name": "value"
+          },
+          "link": 150
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "STRING",
+          "links": [
+            151,
+            156
+          ]
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 76,
+      "type": "PreviewAny",
+      "pos": [
+        868.9945524446423,
+        2431.838073891997
+      ],
+      "size": [
+        272.9777243841356,
+        147.57904638582477
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 151
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 73,
+      "type": "LoadImage",
+      "pos": [
+        101.5086826783915,
+        2012.4827554121443
+      ],
+      "size": [
+        326.2036230531095,
+        326
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            152
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "20250803152343-wan22-_00003_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 84,
+      "type": "LoadImage",
+      "pos": [
+        446.8703750504416,
+        2102.849873836424
+      ],
+      "size": [
+        326.2036230531095,
+        326
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            153
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "20250803152343-wan22-_00004_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 64,
+      "type": "Hailuo23Image2Video",
+      "pos": [
+        549.0370535115001,
+        1203.481478373878
+      ],
+      "size": [
+        326.6610673462559,
+        276
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 13,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 118
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 120
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 117
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            119
+          ]
+        },
+        {
+          "name": "download_url",
+          "type": "STRING",
+          "links": [
+            122
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Hailuo23Image2Video"
+      },
+      "widgets_values": [
+        "",
+        "人物特写",
+        "[拉远]",
+        "",
+        "6",
+        "768P",
+        537250924093664,
+        "randomize"
+      ]
+    },
+    {
+      "id": 83,
+      "type": "Hailuo23FirstLast2Video",
+      "pos": [
+        812.8988975624113,
+        2026.8367760446981
+      ],
+      "size": [
+        400,
+        276
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "first_image",
+          "type": "IMAGE",
+          "link": 152
+        },
+        {
+          "name": "last_image",
+          "type": "IMAGE",
+          "link": 153
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 155
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 154
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            148
+          ]
+        },
+        {
+          "name": "download_url",
+          "type": "STRING",
+          "links": [
+            150
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Hailuo23FirstLast2Video"
+      },
+      "widgets_values": [
+        "",
+        "无",
+        "[右摇]",
+        "",
+        "6",
+        "768P",
+        131840506165838,
+        "randomize"
+      ]
+    },
+    {
+      "id": 78,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        264.3434495711034,
+        2490.679276762592
+      ],
+      "size": [
+        333.40717090722217,
+        88
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            154
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "女人在镜头旋转一周后完成了换装"
+      ]
+    },
+    {
+      "id": 79,
+      "type": "SaveVideo",
+      "pos": [
+        1233.1270318210409,
+        2053.3416134919253
+      ],
+      "size": [
+        272.8273864821215,
+        458.9278967003066
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 148
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveVideo"
+      },
+      "widgets_values": [
+        "video/ComfyUI",
+        "auto",
+        "auto"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        -441.95926190165443,
+        2276.9729950638252
+      ],
+      "size": [
+        364.71261714343973,
+        202
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "可选连接",
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "玩法选择",
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "",
+        "showNav": true,
+        "showAllGraphs": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default"
+      },
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 12,
+      "type": "PrimitiveString",
+      "pos": [
+        -886.927595069747,
+        2333.77425489751
+      ],
+      "size": [
+        346.13329430018143,
+        58
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            49,
+            123,
+            140
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        ""
+      ]
+    }
+  ],
+  "links": [
+    [
+      21,
+      16,
+      0,
+      19,
+      0,
+      "VIDEO"
+    ],
+    [
+      23,
+      19,
+      1,
+      21,
+      0,
+      "STRING"
+    ],
+    [
+      24,
+      19,
+      2,
+      22,
+      0,
+      "INT"
+    ],
+    [
+      25,
+      19,
+      3,
+      23,
+      0,
+      "INT"
+    ],
+    [
+      27,
+      16,
+      0,
+      24,
+      0,
+      "VIDEO"
+    ],
+    [
+      28,
+      19,
+      0,
+      25,
+      0,
+      "VIDEO"
+    ],
+    [
+      49,
+      12,
+      0,
+      42,
+      0,
+      "STRING"
+    ],
+    [
+      116,
+      59,
+      0,
+      34,
+      0,
+      "STRING"
+    ],
+    [
+      117,
+      35,
+      0,
+      64,
+      2,
+      "STRING"
+    ],
+    [
+      118,
+      39,
+      0,
+      64,
+      0,
+      "IMAGE"
+    ],
+    [
+      119,
+      64,
+      0,
+      36,
+      0,
+      "VIDEO"
+    ],
+    [
+      120,
+      42,
+      0,
+      64,
+      1,
+      "STRING"
+    ],
+    [
+      122,
+      64,
+      1,
+      59,
+      0,
+      "STRING"
+    ],
+    [
+      123,
+      12,
+      0,
+      65,
+      0,
+      "STRING"
+    ],
+    [
+      129,
+      69,
+      0,
+      26,
+      0,
+      "STRING"
+    ],
+    [
+      136,
+      11,
+      0,
+      72,
+      0,
+      "STRING"
+    ],
+    [
+      137,
+      65,
+      0,
+      72,
+      1,
+      "STRING"
+    ],
+    [
+      138,
+      72,
+      1,
+      69,
+      0,
+      "STRING"
+    ],
+    [
+      139,
+      72,
+      0,
+      13,
+      0,
+      "VIDEO"
+    ],
+    [
+      140,
+      12,
+      0,
+      74,
+      0,
+      "STRING"
+    ],
+    [
+      148,
+      83,
+      0,
+      79,
+      0,
+      "VIDEO"
+    ],
+    [
+      150,
+      83,
+      1,
+      77,
+      0,
+      "STRING"
+    ],
+    [
+      151,
+      77,
+      0,
+      76,
+      0,
+      "STRING"
+    ],
+    [
+      152,
+      73,
+      0,
+      83,
+      0,
+      "IMAGE"
+    ],
+    [
+      153,
+      84,
+      0,
+      83,
+      1,
+      "IMAGE"
+    ],
+    [
+      154,
+      78,
+      0,
+      83,
+      3,
+      "STRING"
+    ],
+    [
+      155,
+      74,
+      0,
+      83,
+      2,
+      "STRING"
+    ],
+    [
+      156,
+      77,
+      0,
+      16,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "测试功能",
+      "bounding": [
+        85.27793882729051,
+        2777.0762990144854,
+        1474.8565440774598,
+        1087.0727654417358
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "玩法1：文生视频",
+      "bounding": [
+        68.18073060402389,
+        56.50925027812082,
+        1432.248736599269,
+        787.3482251166105
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "玩法2：图生视频",
+      "bounding": [
+        89.97587414497633,
+        953.9354966911167,
+        1432.248736599269,
+        787.3482251166105
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "玩法3：首尾帧生视频",
+      "bounding": [
+        95.46176974309566,
+        1820.3144730768063,
+        1432.248736599269,
+        787.3482251166105
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.5989500000000068,
+      "offset": [
+        1279.5931532661195,
+        -1205.6019297425842
+      ]
+    },
+    "workflowRendererVersion": "LG",
+    "frontendVersion": "1.34.8",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
