@@ -1,4 +1,4 @@
-#  Aiya_mmx_Hailuo-2_3-DMX.py
+# Aiya_mmx_Hailuo-2_3-DMX.py
 from __future__ import annotations
 import os
 import time
@@ -60,10 +60,26 @@ class AiyaHailuo23DMX:
         "【尺寸】仅支持 768P / 1080P，其他值会报错"
     )
 
-    RETURN_TYPES = ("VIDEO", "STRING")          # 双输出
+    RETURN_TYPES = ("VIDEO", "STRING")
     RETURN_NAMES = ("video", "download_url")
     FUNCTION = "generate"
     CATEGORY = "哎呀✦MMX/video"
+
+    # --------------  镜头下拉选项 --------------
+    CAMERA_SHOT_OPTIONS = [
+        "无 / 我自己写",
+        "[固定]",
+        "[推进]", "[拉远]",
+        "[左移]", "[右移]",
+        "[左摇]", "[右摇]",
+        "[上升]", "[下降]",
+        "[上摇]", "[下摇]",
+        "[变焦推近]", "[变焦拉远]",
+        "[晃动]", "[跟随]",
+        "[左摇,上升]",
+        "[推进,右摇]",
+        "[拉远,下降]",
+    ]
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -77,16 +93,21 @@ class AiyaHailuo23DMX:
                 "自动优化提示词": (["开启", "关闭"], {"default": "开启"}),
                 "快速预处理": (["关闭", "开启"], {"default": "关闭"}),
                 "水印": (["关闭", "开启"], {"default": "关闭"}),
+                "camera_shot": (cls.CAMERA_SHOT_OPTIONS, {"default": "无 / 我自己写"}),
             }
         }
 
     def generate(self, api_key, prompt, duration, resolution, seed,
-                 自动优化提示词, 快速预处理, 水印):
+                 自动优化提示词, 快速预处理, 水印, camera_shot):
         if not api_key.strip() or not prompt.strip():
             raise RuntimeError("❌ API-Key 或 Prompt 为空")
 
+        # 如果用户选了镜头，把指令插到最前面
+        if camera_shot != "无 / 我自己写":
+            prompt = f"{camera_shot} {prompt}"
+
         base_url = "https://www.dmxapi.cn"
-        token    = api_key.strip()
+        token = api_key.strip()
 
         payload = {
             "model": "MiniMax-Hailuo-2.3",
@@ -121,7 +142,7 @@ class AiyaHailuo23DMX:
                 print(f"[Hailuo-2.3] 查询异常 HTTP {q_resp.status_code}，继续重试…")
                 continue
             raw = q_resp.json()
-            status  = raw.get("status") or raw.get("state") or "unknown"
+            status = raw.get("status") or raw.get("state") or "unknown"
             file_id = raw.get("file_id")
             if status.lower() == "processing":
                 print(f"[Hailuo-2.3] 处理中… {cnt}/{MAX_POLL}")
@@ -150,8 +171,8 @@ class AiyaHailuo23DMX:
 
         cap = cv2.VideoCapture(str(temp_file))
         fps = cap.get(cv2.CAP_PROP_FPS) or 25.0
-        w   = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        h   = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         cap.release()
 
         video = Video(str(temp_file), fps, w, h)
