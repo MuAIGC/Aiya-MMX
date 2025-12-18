@@ -5,8 +5,8 @@
 <h1 align="center">💕 ComfyUI-Aiya-MMX 💕</h1>
 
 <p align="center">
-  <b>一键加水印 · 调尺寸 · 保存 · 抽卡</b><br>
-  全部带 Emoji 的少女风节点包
+  <b>--</b><br>
+  --
 </p>
 
 <p align="center">
@@ -85,4 +85,3 @@
 <p align="center">
   <b>Made with 💕 by MuAIGC</b>
 </p>
-```
