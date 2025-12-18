@@ -82,11 +82,13 @@
 ## 💖 赞助商 · 感谢投喂
 
 <p align="center">
-  <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/DMXAPI.png" width="420"/>
-</p>
-<p align="center" style="font-size:26px; color:#FF7EB9; font-weight:bold;">
-  DMXAPI 海外模型6.8折 · 国内模型7.9折 · 当天开票 · 快速报销 🎀
-</p>
+    <td align="center">
+      <a href="https://www.dmxapi.cn/register?aff=LpUa">
+        <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/DMXAPI.png" width="420"/>
+      </a>
+      <br/><b style="color:#FF7EB9;font-size:22px;">DMXAPI</b>
+      <br/>海外模型 6.8 折 · 国内模型 7.9 折 · 当天开票 · 快速报销
+    </td>
 <p align="center">
   <small>想成为赞助商？微信戳 <b>MMXaigc</b> 备注「赞助」即可～</small>
 </p>
