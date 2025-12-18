@@ -97,8 +97,8 @@
         </tr>
         <tr>
           <td align="center">
-            <b><font color="#FF7EB9">星海智算</font></b>
-            <br/><small>专业高性能 GPU 云</small>
+            <b><font color="#FF7EB9">星海智算</font>
+              <small>专业高性能 GPU 云</small></b>
           </td>
         </tr>
       </table>
@@ -115,8 +115,8 @@
         </tr>
         <tr>
           <td align="center">
-            <b><font color="#FF7EB9">DMXAPI</font></b>
-            <br/><small>海外 6.8 折 · 国内 7.9 折</small>
+            <b><font color="#FF7EB9">DMXAPI</font>
+              <small>海外 6.8 折 · 国内 7.9 折</small></b>
           </td>
         </tr>
       </table>
