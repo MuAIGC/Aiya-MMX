@@ -1,8 +1,8 @@
 {
   "id": "1fe2d8ef-584b-4bd3-a15c-7822d26d85dd",
   "revision": 0,
-  "last_node_id": 453,
-  "last_link_id": 798,
+  "last_node_id": 485,
+  "last_link_id": 833,
   "nodes": [
     {
       "id": 240,
@@ -31,39 +31,6 @@
       "bgcolor": "#533"
     },
     {
-      "id": 343,
-      "type": "SaveImage",
-      "pos": [
-        340.1501444873048,
-        270.76153404586984
-      ],
-      "size": [
-        343.3388803610885,
-        440.66712095334776
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 776
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.4.0",
-        "Node name for S&R": "SaveImage"
-      },
-      "widgets_values": [
-        "Aiya/%date:yyyyMMdd%-Aiya/%date:yyyyMMdd%_img_Aiya-"
-      ],
-      "color": "#232",
-      "bgcolor": "#353"
-    },
-    {
       "id": 340,
       "type": "PreviewAny",
       "pos": [
@@ -75,7 +42,7 @@
         180.80332945049884
       ],
       "flags": {},
-      "order": 8,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -108,7 +75,7 @@
         433.85562939812837
       ],
       "flags": {},
-      "order": 6,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -145,122 +112,85 @@
       "bgcolor": "#353"
     },
     {
-      "id": 241,
-      "type": "MarkdownNote",
+      "id": 456,
+      "type": "PreviewAny",
       "pos": [
-        -1320.2111671062185,
-        165.4747229092451
+        -362.9213251471617,
+        1806.2488041023996
       ],
       "size": [
-        385.61418813396176,
-        254.58251337908882
-      ],
-      "flags": {
-        "collapsed": false
-      },
-      "order": 1,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "说明",
-      "properties": {},
-      "widgets_values": [
-        "# 【第二步】 选择玩法\n---\n## 这个开关，每次跑图建议，只打开一个“yes”，不然开几个跑几次图"
-      ],
-      "color": "#322",
-      "bgcolor": "#533"
-    },
-    {
-      "id": 269,
-      "type": "PrimitiveStringMultiline",
-      "pos": [
-        -378.4000319218408,
-        278.23736741636384
-      ],
-      "size": [
-        294.88735804476687,
-        171.45192735080718
+        289.46740441035575,
+        180.80332945049884
       ],
       "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            777
-          ]
-        }
-      ],
-      "title": "提示词",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.76",
-        "Node name for S&R": "PrimitiveStringMultiline"
-      },
-      "widgets_values": [
-        "一只圆滚滚的橘猫正趴在初夏午后阳光洒落的木质地板上，半眯着眼打盹，尾巴轻轻卷起，身旁翻倒的咖啡杯里流出浅浅的褐色液体，在暖黄光束下泛着柔和反光，背景是奶油色极简北欧客厅，白墙配原木书架，书架顶层一盆绿萝垂下嫩叶，窗外隐约可见樱花树随风摇曳，粉色花瓣飘进室内，落在猫耳旁，整个画面采用写实厚涂风格，色调温暖柔和，高分辨率，充满治愈氛围，光线细腻，质感丰富，像宫崎骏动画里定格的一帧，安静而温柔\n"
-      ]
-    },
-    {
-      "id": 452,
-      "type": "BaiduAirDMX",
-      "pos": [
-        -742.5262876931748,
-        310.0295123611938
-      ],
-      "size": [
-        328.30244675195263,
-        202.70498417230692
-      ],
-      "flags": {},
-      "order": 5,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 777
-        },
+          "name": "source",
+          "type": "*",
+          "link": 800
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 457,
+      "type": "ImageSaveJPG",
+      "pos": [
+        -21.238198256361542,
+        1563.2040681547749
+      ],
+      "size": [
+        330.9765770869776,
+        433.85562939812837
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
         {
-          "name": "api_key",
-          "type": "STRING",
-          "widget": {
-            "name": "api_key"
-          },
-          "link": 773
+          "name": "images",
+          "type": "IMAGE",
+          "link": 801
         }
       ],
       "outputs": [
         {
-          "name": "image",
-          "type": "IMAGE",
-          "links": [
-            775,
-            776
-          ]
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": []
         },
         {
-          "name": "info",
+          "name": "jpg_path",
           "type": "STRING",
-          "links": [
-            778
-          ]
+          "links": null
         }
       ],
       "properties": {
-        "Node name for S&R": "BaiduAirDMX"
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "Node name for S&R": "ImageSaveJPG",
+        "ver": "664197f6ae0648387a88848ff278ebec99a3e6f6"
       },
       "widgets_values": [
-        "https://www.dmxapi.cn/v1/images/generations",
-        "",
-        "3:4  高清 1104×1472",
-        "url",
-        2044491907,
-        "randomize"
-      ]
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img_Aiya-",
+        95,
+        true,
+        false,
+        false
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
     },
     {
       "id": 239,
@@ -271,10 +201,10 @@
       ],
       "size": [
         357.85851422024825,
-        84.1094506381678
+        154
       ],
       "flags": {},
-      "order": 3,
+      "order": 1,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -299,6 +229,1038 @@
       "bgcolor": "#353"
     },
     {
+      "id": 460,
+      "type": "PreviewAny",
+      "pos": [
+        -370.538621110277,
+        1156.0417541085676
+      ],
+      "size": [
+        289.46740441035575,
+        180.80332945049884
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 805
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 461,
+      "type": "ImageSaveJPG",
+      "pos": [
+        -28.855494219475847,
+        912.9970181609442
+      ],
+      "size": [
+        330.9765770869776,
+        433.85562939812837
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 806
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": []
+        },
+        {
+          "name": "jpg_path",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "Node name for S&R": "ImageSaveJPG",
+        "ver": "664197f6ae0648387a88848ff278ebec99a3e6f6"
+      },
+      "widgets_values": [
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img_Aiya-",
+        95,
+        true,
+        false,
+        true
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 462,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -375.3783134702216,
+        914.5965191121204
+      ],
+      "size": [
+        294.88735804476687,
+        171.45192735080718
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            807
+          ]
+        }
+      ],
+      "title": "提示词",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "2026春节海报：朱红底纹洒金，中央金粉“福”字，右上角“2026”立体鎏金，左下胖橘猫戴小财神帽，环抱金元宝，笑眼弯弯，背后腊梅三两枝，米黄花瓣落肩头，头顶小灯笼写“福”，背景淡金祥云，底部留白“恭贺新禧，阖家幸福”，暖光柔焦，喜庆祥和。"
+      ]
+    },
+    {
+      "id": 476,
+      "type": "SaveImage",
+      "pos": [
+        348.9672401421276,
+        2199.1159590564407
+      ],
+      "size": [
+        343.3388803610885,
+        440.66712095334776
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 821
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "Aiya/%date:yyyyMMdd%-Aiya/%date:yyyyMMdd%_img_Aiya-"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 477,
+      "type": "PreviewAny",
+      "pos": [
+        -364.74324390707153,
+        2448.037027423384
+      ],
+      "size": [
+        289.46740441035575,
+        180.80332945049884
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 822
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 269,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -378.4000319218408,
+        278.23736741636384
+      ],
+      "size": [
+        294.88735804476687,
+        171.45192735080718
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            777
+          ]
+        }
+      ],
+      "title": "提示词",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "漫画风单幅：除夕夜空俯瞰老城区，一条灯笼长河蜿蜒至天际，中央Q版少女“小桃”脚踩巨大饺子滑板冲霄而起，手里甩出“2026”糖葫芦光束，头顶炸开爱心烟花，右下角馋猫“鱼丸”抱着金元宝当鼓敲，对话框飘红“新春快乐！饺子管够！”暖橙淡粉配色，粗黑描边，网点留白，喜庆又俏皮。"
+      ]
+    },
+    {
+      "id": 479,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -369.5829362670168,
+        2206.5917924269347
+      ],
+      "size": [
+        294.88735804476687,
+        171.45192735080718
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            824
+          ]
+        }
+      ],
+      "title": "提示词",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "3D超清月夜：2026春节倒计时，赛博古城被红灯笼海点亮，中央悬浮鎏金“福”字立体雕塑，表面流动霓虹粒子，空中无人机群拼出“2026”巨型数字，冷白光束扫过，与暖红灯笼冷暖对撞。前景Q版熊猫DJ戴着发光耳机，抱着金元宝打碟，音符化作金色流光冲入云霄，背景梅花花瓣被粒子风卷起，形成慢动作漩涡，地面湿漉漉反射所有灯光，浅景深，雪花被虚化成柔白斑点，整体8K分辨率，电影级体积光，既未来又年味十足。"
+      ]
+    },
+    {
+      "id": 454,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        -367.7610175071061,
+        1564.803569105951
+      ],
+      "size": [
+        294.88735804476687,
+        171.45192735080718
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            802
+          ]
+        }
+      ],
+      "title": "提示词",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "超写实8K静态：腊月二十八黄昏，江南老宅门廊下，一盏新换的LED红灯笼映得白墙微红，门中央倒贴的“福”字剪纸边缘还留着手撕毛茬。前景石阶上，穿绛红羽绒服的小女孩双手高举刚点燃的“2026”仙女棒，火星飞溅，照亮她冻红的笑靥；左侧父亲弯腰护住她，深色羊毛大衣领口落着几片薄雪，背景里母亲半倚木门，手提一袋刚蒸好的年糕，热气在冷空气中凝成白雾，缓缓升腾。远处巷口，快递员正把最后一箱年货搬下电瓶车，车尾的红飘带随风轻摆；更远处，古城墙轮廓被一排整齐的节日灯串勾出金边，天空呈钴蓝到深紫的渐变，一弯新月高悬，与近处灯笼的暖光形成冷暖对撞，空气里似有淡淡硝烟与糯米香，镜头35mm，F1.8，浅景深虚化背景光斑，颗粒细腻，仿佛能听见雪落与鞭炮的脆响，年味扑面而来。"
+      ]
+    },
+    {
+      "id": 455,
+      "type": "SaveImage",
+      "pos": [
+        344.1108051162474,
+        1559.9990874401328
+      ],
+      "size": [
+        343.3388803610885,
+        440.66712095334776
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 799
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "Aiya/%date:yyyyMMdd%-Aiya/%date:yyyyMMdd%_img_Aiya-"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 343,
+      "type": "SaveImage",
+      "pos": [
+        314.65099401493495,
+        265.90453094645926
+      ],
+      "size": [
+        343.3388803610885,
+        440.66712095334776
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 776
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "Aiya/%date:yyyyMMdd%-Aiya/%date:yyyyMMdd%_img_Aiya-"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 459,
+      "type": "SaveImage",
+      "pos": [
+        320.1011676964451,
+        907.1206857416264
+      ],
+      "size": [
+        343.3388803610885,
+        440.66712095334776
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 804
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "SaveImage"
+      },
+      "widgets_values": [
+        "Aiya/%date:yyyyMMdd%-Aiya/%date:yyyyMMdd%_img_Aiya-"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 463,
+      "type": "BaiduAirDMX",
+      "pos": [
+        -739.5045692415557,
+        946.3886640569497
+      ],
+      "size": [
+        328.30244675195263,
+        202.70498417230692
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 807
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 808
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            804,
+            806,
+            828
+          ]
+        },
+        {
+          "name": "info",
+          "type": "STRING",
+          "links": [
+            805
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BaiduAirDMX"
+      },
+      "widgets_values": [
+        "https://www.dmxapi.cn/v1/images/generations",
+        "",
+        "3:4  高清 1104×1472",
+        "url",
+        2029887201,
+        "randomize"
+      ]
+    },
+    {
+      "id": 458,
+      "type": "BaiduAirDMX",
+      "pos": [
+        -731.8872732784389,
+        1596.5957140507805
+      ],
+      "size": [
+        328.30244675195263,
+        202.70498417230692
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 802
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 803
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            799,
+            801,
+            829
+          ]
+        },
+        {
+          "name": "info",
+          "type": "STRING",
+          "links": [
+            800
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BaiduAirDMX"
+      },
+      "widgets_values": [
+        "https://www.dmxapi.cn/v1/images/generations",
+        "",
+        "3:4  高清 1104×1472",
+        "url",
+        1353057195,
+        "randomize"
+      ]
+    },
+    {
+      "id": 480,
+      "type": "BaiduAirDMX",
+      "pos": [
+        -733.7091920383493,
+        2238.383937371764
+      ],
+      "size": [
+        322.2312160375966,
+        198
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 824
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 825
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            821,
+            823,
+            830
+          ]
+        },
+        {
+          "name": "info",
+          "type": "STRING",
+          "links": [
+            822
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BaiduAirDMX"
+      },
+      "widgets_values": [
+        "https://www.dmxapi.cn/v1/images/generations",
+        "",
+        "3:4  高清 1104×1472",
+        "url",
+        944134175,
+        "randomize"
+      ]
+    },
+    {
+      "id": 478,
+      "type": "ImageSaveJPG",
+      "pos": [
+        -23.06011701627181,
+        2204.9922914757585
+      ],
+      "size": [
+        330.9765770869776,
+        433.85562939812837
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 823
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": []
+        },
+        {
+          "name": "jpg_path",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "Node name for S&R": "ImageSaveJPG",
+        "ver": "664197f6ae0648387a88848ff278ebec99a3e6f6"
+      },
+      "widgets_values": [
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img_Aiya-",
+        95,
+        true,
+        false,
+        false
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 482,
+      "type": "ImageStitch",
+      "pos": [
+        907.7420202082367,
+        1882.8741998044104
+      ],
+      "size": [
+        270,
+        150
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "图像1",
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 829
+        },
+        {
+          "label": "图像2",
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 830
+        },
+        {
+          "label": "方向",
+          "name": "direction",
+          "type": "COMBO",
+          "widget": {
+            "name": "direction"
+          },
+          "link": null
+        },
+        {
+          "label": "匹配图像尺寸",
+          "name": "match_image_size",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "match_image_size"
+          },
+          "link": null
+        },
+        {
+          "label": "间距宽度",
+          "name": "spacing_width",
+          "type": "INT",
+          "widget": {
+            "name": "spacing_width"
+          },
+          "link": null
+        },
+        {
+          "label": "间距颜色",
+          "name": "spacing_color",
+          "type": "COMBO",
+          "widget": {
+            "name": "spacing_color"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            832
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        2,
+        "white"
+      ]
+    },
+    {
+      "id": 452,
+      "type": "BaiduAirDMX",
+      "pos": [
+        -742.5262876931748,
+        310.0295123611938
+      ],
+      "size": [
+        334.179364455264,
+        204.17425563336633
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 777
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 773
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            775,
+            776,
+            827
+          ]
+        },
+        {
+          "name": "info",
+          "type": "STRING",
+          "links": [
+            778
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "BaiduAirDMX"
+      },
+      "widgets_values": [
+        "https://www.dmxapi.cn/v1/images/generations",
+        "",
+        "3:4  高清 1104×1472",
+        "url",
+        2122114423,
+        "randomize"
+      ]
+    },
+    {
+      "id": 241,
+      "type": "MarkdownNote",
+      "pos": [
+        -1320.2111671062185,
+        165.4747229092451
+      ],
+      "size": [
+        385.61418813396176,
+        254.58251337908882
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "说明",
+      "properties": {},
+      "widgets_values": [
+        "# 【第二步】 选择玩法\n---\n## 这个开关，每次跑图建议，只打开一个“yes”，不然开几个跑几次图"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 483,
+      "type": "ImageStitch",
+      "pos": [
+        1272.270874127361,
+        1794.7576470881847
+      ],
+      "size": [
+        270,
+        150
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "图像1",
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 831
+        },
+        {
+          "label": "图像2",
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 832
+        },
+        {
+          "label": "方向",
+          "name": "direction",
+          "type": "COMBO",
+          "widget": {
+            "name": "direction"
+          },
+          "link": null
+        },
+        {
+          "label": "匹配图像尺寸",
+          "name": "match_image_size",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "match_image_size"
+          },
+          "link": null
+        },
+        {
+          "label": "间距宽度",
+          "name": "spacing_width",
+          "type": "INT",
+          "widget": {
+            "name": "spacing_width"
+          },
+          "link": null
+        },
+        {
+          "label": "间距颜色",
+          "name": "spacing_color",
+          "type": "COMBO",
+          "widget": {
+            "name": "spacing_color"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            833
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "right",
+        true,
+        2,
+        "white"
+      ]
+    },
+    {
+      "id": 485,
+      "type": "MarkdownNote",
+      "pos": [
+        1727.359653349153,
+        126.87512226723823
+      ],
+      "size": [
+        902.6854422773122,
+        1354.7469793638168
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "说明",
+      "properties": {},
+      "widgets_values": [
+        "# MuseSteamer-Air 模型能力速览\n\n---\n\n## 1. 基础定位\n- **中文原生生成**：底层在中英混合语料上训练，对中文成语、地名、人名、网络流行语理解更准确，无需额外翻译模板。  \n- **国风 & 写实双强项**：官方在 3×10⁷ 张东方美学、摄影、插画数据上增训，对汉服、古建筑、山水、节日场景细节还原度高。  \n- **通用创意兼容**：同时支持漫画、赛博、蒸汽波、迪士尼、像素等风格关键词，可一键混合。\n\n---\n\n## 2. 技术规格\n| 项 | 数值 |\n| --- | --- |\n| 最大输出像素 | 16,777,216 px（≈ 2K 任意比例） |\n| 单图最长边 | ≤ 6000 px |\n| 提示词长度 | 1–500 字（UTF-8） |\n| 风格控制 | 自然语言即可，无需模板句法 |\n| 采样步数 | 后台自动分配，平均 20–30 步 |\n| 单张耗时 | 闲时 0.8–3 s，高峰 5–15 s |\n| 支持格式 | PNG、JPG（质量 95） |\n| 色彩空间 | sRGB，8 bit／通道 |\n\n---\n\n## 3. 擅长主题速查\n✅ **国风人像**：汉服纹样、步摇、花钿、披帛、古建筑飞檐、斗拱彩画  \n✅ **东方节日**：春节、元宵、端午、中秋、雪景+灯笼+年夜饭  \n✅ **写实摄影**：肤质毛孔、景深焦外、夜景霓虹、胶片颗粒、光影对比  \n✅ **自然场景**：江南烟雨、黄山云海、戈壁落日、樱花雨、荷塘  \n✅ **现代插画**：扁平插、国潮漫画、水墨+赛博混搭、像素图标  \n✅ **产品海报**：零食包装、饮料瓶、手机壳、化妆品、珠宝反光  \n\n⚠️ **相对普通**：纯西方魔幻（龙、骑士）、极端解剖、机械内部爆炸剖面、小语种文字生成。\n\n---\n\n## 4. 语言与风格提示\n- **纯中文即可**：  \n  “唐朝女官，写意水墨，淡彩，留白” ≈ 同等英文 50 词效果。  \n- **风格词放句末**：  \n  “超写实 8K”“国潮漫画”“柔焦摄影”“像素风 16×16”模型可识别。  \n- **多主题用分号**：  \n  “汉服少女；雪夜古城；暖光；8K 写实”利于注意力分段。  \n- **避免敏感**：血腥、政治、露点、未成年涩情将直接 400 拦截。\n\n---\n\n## 5. 画质与分辨率\n- **内置超分**：生成后再走一遍内部 ESRGAN，边缘锯齿与摩尔纹显著减少。  \n- **噪点控制**：暗光场景自动加颗粒，高光区保持干净，无需额外“film grain”提示。  \n- **肤色保真**：针对东亚肤色校准，过曝区域自动压高光，保留毛孔层次。\n\n---\n\n## 6. 速度 & 并发\n- 单账号默认 QPS≈2，高峰降至 1。  \n- 高清 / 普清同价，后台根据像素自动选采样步数，高清多 30% 时间。  \n- 如遇到 503，官方建议“降尺寸 or 错峰”，而非提高 QPS。\n\n---\n\n## 7. 典型样例（copy 即用）\n1. 国风：  \n   “初夏园林，薄荷绿齐胸襦裙少女，倚朱栏，手持团扇，蝉鸣，阳光透过芭蕉，写实摄影”  \n2. 春节：  \n   “2026 除夕雪夜，奶奶家厨房，蒸汽升腾，孙子贴福字，橘猫偷吃年糕，暖光，超写实”  \n3. 漫画：  \n   “Q 版剑客，水墨加赛博，背景 Tokyo 霓虹，对话框‘新年必胜！’，国潮漫画风”  \n4. 产品：  \n   “青玉磨砂酒瓶，龙纹浮雕，舞台射灯，冷烟环绕，高端摄影，黑色镜面台，8K”\n\n---\n\n## 8. 与其他百度文生图模型对比\n| 模型 | 国风细节 | 中文长句 | 高清上限 | 速度 |\n| --- | --- | --- | --- | --- |\n| **MuseSteamer-Air** | ★★★★★ | ★★★★☆ | 16M px | 1-3s |\n| ERNIE-ViLG 2 | ★★★☆ | ★★★ | 4M px | 5-8s |\n| ERNIE-ViLG 1 | ★★ | ★★ | 1M px | 3-5s |\n\n---\n\n## 9. 合规 & 版权\n- 生成内容版权归调用者所有，可商用。  \n- 平台仅做内容安全过滤，不存储最终图片。  \n- 不得用于伪造、诽谤、色情、暴恐等违法场景。\n\n---\n\n## 10. 一句话总结\nMuseSteamer-Air = 中英双语底座 + 东方美学增训 + 16M 像素直出 + 纯自然语言驱动，想让 AI 画“正宗国风味”，用它就够了。"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 484,
+      "type": "ImageSaveJPG",
+      "pos": [
+        720.5061044124911,
+        120.46687108051285
+      ],
+      "size": [
+        979.8310795402074,
+        1357.7244179588488
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 833
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": []
+        },
+        {
+          "name": "jpg_path",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "Node name for S&R": "ImageSaveJPG",
+        "ver": "664197f6ae0648387a88848ff278ebec99a3e6f6"
+      },
+      "widgets_values": [
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img_Aiya-",
+        95,
+        true,
+        false,
+        false
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 481,
+      "type": "ImageStitch",
+      "pos": [
+        911.1589120480162,
+        1667.0421179517602
+      ],
+      "size": [
+        267.6336333550348,
+        150
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "label": "图像1",
+          "name": "image1",
+          "type": "IMAGE",
+          "link": 827
+        },
+        {
+          "label": "图像2",
+          "name": "image2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 828
+        },
+        {
+          "label": "方向",
+          "name": "direction",
+          "type": "COMBO",
+          "widget": {
+            "name": "direction"
+          },
+          "link": null
+        },
+        {
+          "label": "匹配图像尺寸",
+          "name": "match_image_size",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "match_image_size"
+          },
+          "link": null
+        },
+        {
+          "label": "间距宽度",
+          "name": "spacing_width",
+          "type": "INT",
+          "widget": {
+            "name": "spacing_width"
+          },
+          "link": null
+        },
+        {
+          "label": "间距颜色",
+          "name": "spacing_color",
+          "type": "COMBO",
+          "widget": {
+            "name": "spacing_color"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            831
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.4.0",
+        "Node name for S&R": "ImageStitch"
+      },
+      "widgets_values": [
+        "down",
+        true,
+        222,
+        "white"
+      ]
+    },
+    {
       "id": 263,
       "type": "PrimitiveString",
       "pos": [
@@ -310,7 +1272,7 @@
         58
       ],
       "flags": {},
-      "order": 4,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -318,7 +1280,10 @@
           "name": "STRING",
           "type": "STRING",
           "links": [
-            773
+            773,
+            803,
+            808,
+            825
           ]
         }
       ],
@@ -373,17 +1338,232 @@
       340,
       0,
       "STRING"
+    ],
+    [
+      799,
+      458,
+      0,
+      455,
+      0,
+      "IMAGE"
+    ],
+    [
+      800,
+      458,
+      1,
+      456,
+      0,
+      "STRING"
+    ],
+    [
+      801,
+      458,
+      0,
+      457,
+      0,
+      "IMAGE"
+    ],
+    [
+      802,
+      454,
+      0,
+      458,
+      0,
+      "STRING"
+    ],
+    [
+      803,
+      263,
+      0,
+      458,
+      1,
+      "STRING"
+    ],
+    [
+      804,
+      463,
+      0,
+      459,
+      0,
+      "IMAGE"
+    ],
+    [
+      805,
+      463,
+      1,
+      460,
+      0,
+      "STRING"
+    ],
+    [
+      806,
+      463,
+      0,
+      461,
+      0,
+      "IMAGE"
+    ],
+    [
+      807,
+      462,
+      0,
+      463,
+      0,
+      "STRING"
+    ],
+    [
+      808,
+      263,
+      0,
+      463,
+      1,
+      "STRING"
+    ],
+    [
+      821,
+      480,
+      0,
+      476,
+      0,
+      "IMAGE"
+    ],
+    [
+      822,
+      480,
+      1,
+      477,
+      0,
+      "STRING"
+    ],
+    [
+      823,
+      480,
+      0,
+      478,
+      0,
+      "IMAGE"
+    ],
+    [
+      824,
+      479,
+      0,
+      480,
+      0,
+      "STRING"
+    ],
+    [
+      825,
+      263,
+      0,
+      480,
+      1,
+      "STRING"
+    ],
+    [
+      827,
+      452,
+      0,
+      481,
+      0,
+      "IMAGE"
+    ],
+    [
+      828,
+      463,
+      0,
+      481,
+      1,
+      "IMAGE"
+    ],
+    [
+      829,
+      458,
+      0,
+      482,
+      0,
+      "IMAGE"
+    ],
+    [
+      830,
+      480,
+      0,
+      482,
+      1,
+      "IMAGE"
+    ],
+    [
+      831,
+      481,
+      0,
+      483,
+      0,
+      "IMAGE"
+    ],
+    [
+      832,
+      482,
+      0,
+      483,
+      1,
+      "IMAGE"
+    ],
+    [
+      833,
+      483,
+      0,
+      484,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [
     {
       "id": 1,
-      "title": "玩法1：文生图(漫画)",
+      "title": "玩法：文生图(漫画)",
       "bounding": [
         -795.589513331422,
         86.5578823588315,
-        1594.0562541427307,
-        676.0180664622321
+        1488.538243946504,
+        634.612293371042
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "玩法：文生图(写实)",
+      "bounding": [
+        -784.9504989166858,
+        1373.1240840484184,
+        1483.1955405371518,
+        631.9408907145704
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "玩法：文生图(海报)",
+      "bounding": [
+        -792.5677948798029,
+        722.9170340545879,
+        1484.5311909135924,
+        635.9479437474822
+      ],
+      "color": "#3f789e",
+      "font_size": 100,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "玩法：文生图(3D）",
+      "bounding": [
+        -786.7724176765962,
+        2014.9123073694032,
+        1483.1955405371518,
+        633.2766429946022
       ],
       "color": "#3f789e",
       "font_size": 100,
@@ -393,10 +1573,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7247295000000148,
+      "scale": 0.5989500000000166,
       "offset": [
-        2086.138557787524,
-        223.8174089710219
+        924.7148061597393,
+        23.335172150827418
       ]
     },
     "frontendVersion": "1.34.9",
