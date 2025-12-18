@@ -82,23 +82,44 @@
 ## 💖 赞助商 · 感谢投喂
 <p align="center"><i>排名不分先后，一起给项目续命 🎀</i></p>
 
-<table align="center" cellpadding="16">
-  <tr>
-    <!-- 星海智算 -->
-    <td align="center" valign="top">
-      <a href="https://spacehpc.com/user/register?inviteCode=46153274">
-        <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/starsea-2.png" width="160"/>
-      </a>
-      <br/><b><font color="#FF7EB9">星海智算</font></b>
-      <br/><small>专业高性能 GPU 云</small>
+<!-- 外层表格：居中、允许换行 -->
+<table align="center" border="0" cellpadding="12" cellspacing="8">
+  <tr valign="top">
+    <!-- 星海智算 大格子 -->
+    <td align="center" style="border:1px solid #FFE0F0; border-radius:8px; padding:8px;">
+      <table border="0" cellpadding="4" cellspacing="0">
+        <tr>
+          <td align="center" width="140">
+            <a href="https://spacehpc.com/user/register?inviteCode=46153274">
+              <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/starsea-2.png" width="140"/>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">
+            <b><font color="#FF7EB9">星海智算</font></b>
+            <br/><small>专业高性能 GPU 云</small>
+          </td>
+        </tr>
+      </table>
     </td>
-    <!-- DMXAPI -->
-    <td align="center" valign="top">
-      <a href="https://www.dmxapi.cn/register?aff=LpUa">
-        <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/DMXAPI.png" width="160"/>
-      </a>
-      <br/><b><font color="#FF7EB9">DMXAPI</font></b>
-      <br/><small>海外 6.8 折 · 国内 7.9 折</small>
+    <!-- DMXAPI 大格子 -->
+    <td align="center" style="border:1px solid #FFE0F0; border-radius:8px; padding:8px;">
+      <table border="0" cellpadding="4" cellspacing="0">
+        <tr>
+          <td align="center" width="140">
+            <a href="https://www.dmxapi.cn/register?aff=LpUa">
+              <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/DMXAPI.png" width="140"/>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td align="center">
+            <b><font color="#FF7EB9">DMXAPI</font></b>
+            <br/><small>海外 6.8 折 · 国内 7.9 折</small>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>
