@@ -106,7 +106,7 @@ class AiyaHailuo23DMX:
     RETURN_TYPES = ("VIDEO", "STRING")
     RETURN_NAMES = ("video", "download_url")
     FUNCTION = "generate"
-    CATEGORY = "哎呀✦MMX/video"
+    CATEGORY = "哎呀✦MMX/DMXAPI"
 
     CAMERA_SHOT_OPTIONS = [
         "无 / 我自己写",
@@ -249,7 +249,7 @@ class Hailuo23Image2Video:
     RETURN_TYPES = ("VIDEO", "STRING")
     RETURN_NAMES = ("video", "download_url")
     FUNCTION = "generate"
-    CATEGORY = "哎呀✦MMX/video"
+    CATEGORY = "哎呀✦MMX/DMXAPI"
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -385,7 +385,7 @@ class Hailuo23FirstLast2Video:
     RETURN_TYPES = ("VIDEO", "STRING")
     RETURN_NAMES = ("video", "download_url")
     FUNCTION = "generate"
-    CATEGORY = "哎呀✦MMX/video"
+    CATEGORY = "哎呀✦MMX/DMXAPI"
 
     @classmethod
     def INPUT_TYPES(cls):
