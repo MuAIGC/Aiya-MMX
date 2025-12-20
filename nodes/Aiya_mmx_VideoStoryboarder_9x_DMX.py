@@ -54,7 +54,7 @@ class VideoStoryboarder_9x_DMX:
     RETURN_TYPES = tuple(["STRING"] * 9)
     RETURN_NAMES = tuple([f"shot_{i}" for i in range(1, 10)])
     FUNCTION = "storyboard"
-    CATEGORY = "哎呀✦MMX/video"
+    CATEGORY = "哎呀✦MMX/DMXAPI"
 
     @classmethod
     def INPUT_TYPES(cls):
