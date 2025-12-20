@@ -50,7 +50,7 @@ class ImageSaveJPG:
     RETURN_NAMES = ("prompt_text", "jpg_path")
     FUNCTION = "save_images"
     OUTPUT_NODE = True
-    CATEGORY = "哎呀✦MMX/输出"
+    CATEGORY = "哎呀✦MMX/图像"
 
     def save_images(self,
                     images,
