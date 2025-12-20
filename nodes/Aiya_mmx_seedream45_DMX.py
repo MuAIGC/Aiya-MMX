@@ -115,7 +115,7 @@ class SeeDream4_5_DMX:
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("image", "info")
     FUNCTION = "generate"
-    CATEGORY = "哎呀✦MMX/SeeDream"
+    CATEGORY = "哎呀✦MMX/DMX"
 
     # ---------- 内部 ----------
     def resolve_size(self, clarity, ar):
