@@ -126,7 +126,7 @@ class VideoPromptOptimizer_DMX:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("optimized_zh", "optimized_en")
     FUNCTION = "optimize"
-    CATEGORY = "哎呀✦MMX/video"
+    CATEGORY = "哎呀✦MMX/DMXAPI"
 
     @classmethod
     def INPUT_TYPES(cls):
