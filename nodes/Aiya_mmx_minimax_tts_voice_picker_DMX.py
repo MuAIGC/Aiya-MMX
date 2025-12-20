@@ -99,7 +99,7 @@ class MiniMaxVoicePicker_DMX:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("voice_in",)
     FUNCTION = "pick_voice"
-    CATEGORY = "哎呀✦MMX/audio"
+    CATEGORY = "哎呀✦MMX/DMXAPI"
 
     def __init__(self):
         pass
