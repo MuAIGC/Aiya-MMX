@@ -59,7 +59,7 @@ class AiyaMMXNanoBananaPro:
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("image", "info")          # ← 下游预览字符串节点友好
     FUNCTION = "generate"
-    CATEGORY = "哎呀✦MMX/生成"
+    CATEGORY = "哎呀✦MMX/T8API"
 
     # ---------- 工具 ----------
     def add_random(self, p: str) -> str:
