@@ -31,7 +31,7 @@ class AiyaMMXVideoToPath:
     RETURN_TYPES = ("VIDEO", "STRING", "INT", "INT")
     RETURN_NAMES = ("video", "file_path", "width", "height")
     FUNCTION = "convert"
-    CATEGORY = "哎呀✦MMX/工具"
+    CATEGORY = "哎呀✦MMX/video"
 
     def convert(self, video, delete_source=False):
         if video is None:
