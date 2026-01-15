@@ -34,7 +34,7 @@ class NanoBanana2_DMX:
     DESCRIPTION = (
         "💕 哎呀✦NanoBanana2-DMX 一键出图\n\n"
         "无图 = 文生图 (/generations)  |  有图 = 图生图 (/edits)\n"
-        "模型：nano-banana-2  |  最多 14 张参考图\n"
+        "模型：nano-banana-2 / gemini-3-pro-image-preview  |  最多 14 张参考图\n"
         "分辨率：1K / 2K / 4K  |  宽高比：1:1 ~ 21:9\n"
         "字段与官方 1:1 映射，自动降级，免保存配置\n\n"
         "English: Auto txt|img2img, 14 imgs, 1-4K, fallback on error."
@@ -49,7 +49,7 @@ class NanoBanana2_DMX:
             "required": {
                 "endpoint_url": ("STRING", {
                     "default": cls.DEFAULT_ENDPOINT,
-                    "placeholder": "https://www.dmxapi.cn/v1/images/(generations|edits)"
+                    "placeholder": "https://www.dmxapi.cn/v1/images/(generations |edits)"
                 }),
                 "api_key": ("STRING", {
                     "default": "", "placeholder": "Your API key"
@@ -61,8 +61,12 @@ class NanoBanana2_DMX:
                     {"default": "1:1"}
                 ),
                 "size": (["1K", "2K", "4K"], {"default": "2K"}),
+                "model_select": (["nano-banana-2", "gemini-3-pro-image-preview"], {"default": "nano-banana-2"}),
             },
-            "optional": {f"input_image_{i}": ("IMAGE",) for i in range(1, 15)}
+            "optional": {
+                "model_str": ("STRING", {"forceInput": True, "default": ""}),
+                **{f"input_image_{i}": ("IMAGE",) for i in range(1, 15)}
+            }
         }
 
     RETURN_TYPES = ("IMAGE", "STRING")
@@ -71,7 +75,7 @@ class NanoBanana2_DMX:
     CATEGORY = "哎呀✦MMX/DMXAPI"
 
     # ---------- 内部 ----------
-    def build_json(self, prompt, imgs, ar, size):
+    def build_json(self, prompt, imgs, ar, size, model):
         """文生图 /generations"""
         port_map = {idx + 1: idx + 1 for idx, img in enumerate(imgs) if img is not None}
         for port, arr in port_map.items():
@@ -84,7 +88,7 @@ class NanoBanana2_DMX:
                 pil.save(buf, format="PNG")
                 parts.append(base64.b64encode(buf.getvalue()).decode())
         payload = {
-            "model": "nano-banana-2",
+            "model": model,
             "prompt": prompt,
             "aspect_ratio": ar,
             "size": size.lower(),
@@ -95,7 +99,7 @@ class NanoBanana2_DMX:
             payload["image"] = parts
         return payload
 
-    def build_multipart(self, prompt, imgs, ar, size):
+    def build_multipart(self, prompt, imgs, ar, size, model):
         """图生图 /edits"""
         port_map = {idx + 1: idx + 1 for idx, img in enumerate(imgs) if img is not None}
         for port, arr in port_map.items():
@@ -109,7 +113,7 @@ class NanoBanana2_DMX:
                 buf.seek(0)
                 files.append(("image", ("nb2.png", buf, "image/png")))
         data = {
-            "model": "nano-banana-2",
+            "model": model,
             "prompt": prompt,
             "aspect_ratio": ar,
             "size": size.lower(),
@@ -129,7 +133,7 @@ class NanoBanana2_DMX:
             raise RuntimeError("No image returned")
         return images
 
-    def call_api(self, url, key, ar, size, **kwargs):
+    def call_api(self, url, key, ar, size, model, **kwargs):
         """温柔重试：300 s 超时，最多 3 次，503/5xx/超时都重试"""
         headers = {"Authorization": f"Bearer {key}"}
         max_retry = 3
@@ -185,24 +189,28 @@ class NanoBanana2_DMX:
         )
 
     # ---------- 主入口 ----------
-    def generate(self, endpoint_url, api_key, prompt, aspect_ratio, size, **img_ports):
+    def generate(self, endpoint_url, api_key, prompt, aspect_ratio, size, model_select, model_str=None, **img_ports):
         if not endpoint_url or not api_key:
             raise RuntimeError("[NanoBanana2-DMX] endpoint_url 和 api_key 不能为空！")
+        
+        # 优先用外部传入的模型字符串，没有就用下拉框
+        model = model_str.strip() if model_str and model_str.strip() else model_select
+        
         imgs = [img_ports.get(f"input_image_{i}") for i in range(1, 15)]
         cnt = len([i for i in imgs if i is not None])
         mode = "图生图/编辑" if cnt else "文生图"
         print(f"\n[NanoBanana2-DMX] ===== {mode} =====")
-        print(f"[NanoBanana2-DMX] imgs: {cnt}  ratio: {aspect_ratio}  size: {size}")
+        print(f"[NanoBanana2-DMX] model: {model}  imgs: {cnt}  ratio: {aspect_ratio}  size: {size}")
 
         base_url = endpoint_url.rstrip("/")
         if mode == "文生图":
             url = base_url.replace("/edits", "/generations")
-            payload = self.build_json(prompt, imgs, aspect_ratio, size)
-            resp = self.call_api(url, api_key, aspect_ratio, size, json=payload)
+            payload = self.build_json(prompt, imgs, aspect_ratio, size, model)
+            resp = self.call_api(url, api_key, aspect_ratio, size, model, json=payload)
         else:
             url = base_url.replace("/generations", "/edits")
-            data, files = self.build_multipart(prompt, imgs, aspect_ratio, size)
-            resp = self.call_api(url, api_key, aspect_ratio, size, data=data, files=files)
+            data, files = self.build_multipart(prompt, imgs, aspect_ratio, size, model)
+            resp = self.call_api(url, api_key, aspect_ratio, size, model, data=data, files=files)
 
         if resp.status_code != 200:
             raise RuntimeError(f"HTTP {resp.status_code}: {resp.text[:200]}")
@@ -210,7 +218,7 @@ class NanoBanana2_DMX:
         images = self.decode_all(resp.json())
         best = max(images, key=lambda im: im.width * im.height)
         txt = (f"🍌 NanoBanana2-DMX {mode}  {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
-               f"endpoint: {url}\nratio: {aspect_ratio}  size: {size}\n"
+               f"endpoint: {url}\nmodel: {model}\nratio: {aspect_ratio}  size: {size}\n"
                f"input: {cnt}  output: {len(images)}")
         return (pil2tensor(best), txt)
 
