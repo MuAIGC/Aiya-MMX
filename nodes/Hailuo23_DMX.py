@@ -16,7 +16,7 @@ from PIL import Image
 import folder_paths
 from ..register import register_node
 from ..video_adapter import Video
-from .MMX_nodes_image_save_jpg import ImageSaveJPG as _save_jpg
+from .img_tools import save2JPG_mmx as _save_jpg
 
 # --------------------------------------------------
 # 通用常量
