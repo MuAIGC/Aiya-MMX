@@ -1,4 +1,4 @@
-# ComfyUI/custom_nodes/Aiya_mmx/nodes/img_tools.py
+# ~/ComfyUI/custom_nodes/Aiya_mmx/nodes/img_tools.py
 from __future__ import annotations
 import os
 import json
