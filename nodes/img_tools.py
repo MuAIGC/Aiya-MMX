@@ -2,9 +2,13 @@
 from __future__ import annotations
 import os
 import json
-import torch
+import uuid
+from pathlib import Path
+
 import numpy as np
+import torch
 from PIL import Image
+
 import folder_paths
 from ..register import register_node
 
@@ -147,7 +151,55 @@ class save2JPG_mmx:
         return "\n".join(texts)
 
 # --------------------------------------------------
+#  3. 路径读图  LoadImageFromPath_mmx
+# --------------------------------------------------
+CACHE_DIR = Path(folder_paths.get_output_directory()) / "path_cache"
+
+class LoadImageFromPath_mmx:
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image",)
+    FUNCTION = "load"
+    CATEGORY = "哎呀✦MMX/图像"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+                "path": ("STRING", {"default": "", "multiline": False}),
+                "cache_name": ("STRING", {"default": "default", "multiline": False})
+        }}
+
+    def load(self, path, cache_name):
+        from ..date_variable import replace_date_vars
+
+        path = path.strip()
+        cache_name = cache_name.strip() or "default"
+        path_file = CACHE_DIR / f"{cache_name}.path"
+
+        # 1. 空输入 → 读缓存
+        if not path:
+            if path_file.exists():
+                path = path_file.read_text(encoding="utf-8").strip()
+            if not path:
+                raise RuntimeError(f"LoadImageFromPath_mmx: 缓存「{cache_name}」为空！")
+        # 2. 非空输入 → 写缓存
+        else:
+            path = replace_date_vars(path)
+            CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            path_file.write_text(path, encoding="utf-8")
+
+        # 3. 加载
+        path = Path(path).expanduser().resolve()
+        if not path.exists():
+            raise FileNotFoundError(f"LoadImageFromPath_mmx: 文件不存在 → {path}")
+
+        img = Image.open(path).convert("RGB")
+        img_np = np.array(img).astype(np.float32) / 255.0
+        rgb = torch.from_numpy(img_np).unsqueeze(0)
+        return (rgb,)
+
+# --------------------------------------------------
 #  统一注册
 # --------------------------------------------------
 register_node(ImageBatchCollector_mmx, "ImageBatchCollector_mmx")
 register_node(save2JPG_mmx, "save2JPG_mmx")
+register_node(LoadImageFromPath_mmx, "LoadImageFromPath_mmx")
