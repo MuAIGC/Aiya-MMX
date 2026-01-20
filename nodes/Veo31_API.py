@@ -1,4 +1,4 @@
-# Veo3_1_API.py
+# Veo31_API.py
 from __future__ import annotations
 import json
 import requests
@@ -14,7 +14,7 @@ from PIL import Image
 from datetime import datetime
 from ..register import register_node
 from ..mmx_utils import pil2tensor, tensor2pil
-from ..video_adapter import Video          # ComfyUI 标准 VIDEO 对象
+from ..video_adapter import Video
 
 VEO3_MODELS = [
     "veo3.1", "veo3.1-pro", "veo3.1-components",
@@ -22,7 +22,7 @@ VEO3_MODELS = [
 ]
 
 # --------------------------------------------------
-# 通用工具（直接抄 DMX 节点的写法）
+# 通用工具
 # --------------------------------------------------
 def build_video_obj(video_path: Path) -> Video:
     """把本地 mp4 封装成 ComfyUI VIDEO 对象"""
@@ -55,7 +55,7 @@ def download_file(url: str, dst: Path, max_retry: int = 3, timeout: int = 120):
 # --------------------------------------------------
 # 节点主体
 # --------------------------------------------------
-class ComflyVeo3_1:
+class Veo3_1:
     DESCRIPTION = (
         "💕 哎呀✦MMX/Veo3.1 谷歌文生视频\n\n"
         "【功能】输入文本 → 输出视频张量 + URL + 任务信息\n"
@@ -84,9 +84,9 @@ class ComflyVeo3_1:
         return {
             "required": {
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***************************"}),
-                "base_url": ("STRING", {"default": "https://ai.t8star.cn", "placeholder": "API 根地址"}),
+                "base_url": ("STRING", {"default": "https://ai.t8star.cn ", "placeholder": "API 根地址"}),
                 "prompt": ("STRING", {"multiline": True, "default": "A cinematic aerial shot of a neon-lit cyberpunk city at night, 4K, ultra detailed"}),
-                "model": (VEO3_MODELS, {"default": "veo3.1-pro"}),
+                "model": ("STRING", {"default": "veo3.1", "placeholder": "veo3.1 / veo3.1-fast / veo3.1-pro / ..."}),
                 "duration": (["5", "10", "15", "20", "25"], {"default": "10"}),
                 "aspect_ratio": (["16:9", "9:16"], {"default": "16:9"}),
                 "enhance_prompt": ("BOOLEAN", {"default": True}),
@@ -170,7 +170,7 @@ class ComflyVeo3_1:
                         temp_file = temp_dir / f"veo3_1_{int(time.time()*1000)}.mp4"
                         download_file(video_url, temp_file)
 
-                        # 封装成 ComfyUI VIDEO 对象
+                        # 封装成 VIDEO 对象
                         video_obj = build_video_obj(temp_file)
                         info_json = {
                             "task_id": task_id,
@@ -200,4 +200,4 @@ class ComflyVeo3_1:
             return (Video.create_empty(), "", f"❌ 异常: {str(e)}")
 
 # ========== 注册节点 ==========
-register_node(ComflyVeo3_1, "Comfly Veo3.1 文生视频")
+register_node(Veo3_1, "Veo3.1 文生视频")
