@@ -153,7 +153,7 @@ class save2JPG_mmx:
 # --------------------------------------------------
 #  3. 路径读图  LoadImageFromPath_mmx
 # --------------------------------------------------
-CACHE_DIR = Path(folder_paths.get_output_directory()) / "Aiya"
+CACHE_DIR = Path(folder_paths.get_output_directory()) / "Aiya/Aiya_path"
 
 class LoadImageFromPath_mmx:
     RETURN_TYPES = ("IMAGE",)
