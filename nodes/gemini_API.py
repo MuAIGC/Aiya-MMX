@@ -46,6 +46,7 @@ class NanoBananaPro:
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"forceInput": True, "multiline": True}),
                 "aspect_ratio": (["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"], {"default": "1:1"}),
+                "model": ("STRING", {"default": "nano-banana-2"}),
             },
             "optional": {f"input_image_{i}": ("IMAGE",) for i in range(1, 15)}
         }
@@ -58,7 +59,7 @@ class NanoBananaPro:
     def add_random(self, p: str) -> str:
         return f"{p} [var-{random.randint(10000, 99999)}]"
 
-    def build_payload(self, prompt, imgs, ar):
+    def build_payload(self, prompt, imgs, ar, model: str):
         # 端口→数组索引映射
         port_map = {idx + 1: idx + 1 for idx, img in enumerate(imgs) if img is not None}
         for port, arr in port_map.items():
@@ -74,7 +75,7 @@ class NanoBananaPro:
         parts.append({"text": self.add_random(prompt)})
 
         payload = {
-            "model": "nano-banana-2",
+            "model": model,
             "prompt": parts[-1]["text"],
             "aspect_ratio": ar,
             "image_size": "2K",
@@ -105,12 +106,12 @@ class NanoBananaPro:
         print(f"[NanoBanana] picked largest")
         return best
 
-    def generate(self, endpoint_url, api_key, prompt, aspect_ratio, **img_ports):
+    def generate(self, endpoint_url, api_key, prompt, aspect_ratio, model, **img_ports):
         imgs = [img_ports.get(f"input_image_{i}") for i in range(1, 15)]
         cnt = sum(1 for i in imgs if i is not None)
-        print(f"[NanoBanana] imgs={cnt} ratio={aspect_ratio}")
+        print(f"[NanoBanana] model={model} imgs={cnt} ratio={aspect_ratio}")
 
-        payload = self.build_payload(prompt, imgs, aspect_ratio)
+        payload = self.build_payload(prompt, imgs, aspect_ratio, model)
         headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         resp = requests.post(endpoint_url, headers=headers, json=payload, timeout=180)
         if resp.status_code != 200:
@@ -121,7 +122,7 @@ class NanoBananaPro:
             raise RuntimeError("No image returned")
         best = self.decode_biggest(urls)
 
-        info = f"🍌 NanoBanana {time.strftime('%Y-%m-%d %H:%M:%S')}\nendpoint: {endpoint_url}\nratio: {aspect_ratio}  size: 2K\ninput: {cnt}  success: True"
+        info = f"🍌 NanoBanana {time.strftime('%Y-%m-%d %H:%M:%S')}\nendpoint: {endpoint_url}\nmodel: {model}\nratio: {aspect_ratio}  size: 2K\ninput: {cnt}  success: True"
         return (best, info)
 
 
