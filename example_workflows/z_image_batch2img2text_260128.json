@@ -1,0 +1,1001 @@
+{
+  "id": "9ae6082b-c7f4-433c-9971-7a8f65a3ea65",
+  "revision": 0,
+  "last_node_id": 91,
+  "last_link_id": 108,
+  "nodes": [
+    {
+      "id": 62,
+      "type": "CLIPLoader",
+      "pos": [
+        -376.69388928906346,
+        -43.08000322545842
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            78,
+            82
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.73",
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen_3_4b.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors",
+            "directory": "text_encoders"
+          }
+        ],
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        "qwen_3_4b.safetensors",
+        "lumina2",
+        "default"
+      ]
+    },
+    {
+      "id": 67,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -369.44738503819855,
+        229.3716212583397
+      ],
+      "size": [
+        410,
+        315
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 78
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 88
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            75
+          ]
+        }
+      ],
+      "title": "CLIP Text Encode (Positive Prompt)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.73",
+        "Node name for S&R": "CLIPTextEncode",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        ""
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 63,
+      "type": "VAELoader",
+      "pos": [
+        -376.69388928906346,
+        106.92005285505489
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            73
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.73",
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "ae.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors",
+            "directory": "vae"
+          }
+        ],
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        "ae.safetensors"
+      ]
+    },
+    {
+      "id": 90,
+      "type": "MarkdownNote",
+      "pos": [
+        -827.963896518071,
+        -746.3658156502239
+      ],
+      "size": [
+        384.9431470394745,
+        296.28984931400294
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "说明",
+      "properties": {},
+      "widgets_values": [
+        "# 使用API模型需  填/注册API\n---\n## 可以使用贞贞工坊API\n\n## [>>点这里获取key<<](https://ai.t8star.cn/register?aff=QdDN47556/)\n\n## 令牌->添加令牌->获得key\n\n## ->将key填入下框->确认"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 85,
+      "type": "ImageFolderLoader_mmx",
+      "pos": [
+        -1202.8380288740252,
+        -185.13497557919325
+      ],
+      "size": [
+        266.237890625,
+        258
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "single_image",
+          "type": "IMAGE",
+          "links": [
+            95,
+            103
+          ]
+        },
+        {
+          "name": "batch",
+          "type": "IMAGE",
+          "links": []
+        },
+        {
+          "name": "current_file",
+          "type": "STRING",
+          "links": []
+        },
+        {
+          "name": "current_index",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "total_files",
+          "type": "INT",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "7e67126b953b9ac227607a696e1beb1e7ba7ea11",
+        "Node name for S&R": "ImageFolderLoader_mmx"
+      },
+      "widgets_values": [
+        "F:\\000存档\\2026\\2601\\20260115-Aiya",
+        1,
+        1,
+        false,
+        true,
+        "*"
+      ]
+    },
+    {
+      "id": 87,
+      "type": "PreviewAny",
+      "pos": [
+        -813.2073761464706,
+        207.15688817042593
+      ],
+      "size": [
+        309.58274638802504,
+        350.5524715900054
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source",
+          "type": "*",
+          "link": 102
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.0",
+        "Node name for S&R": "PreviewAny"
+      },
+      "widgets_values": [
+        null,
+        null,
+        false
+      ]
+    },
+    {
+      "id": 66,
+      "type": "UNETLoader",
+      "pos": [
+        -376.69388928906346,
+        -173.0800268788969
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            71
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.73",
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "z_image_bf16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/z_image/resolve/main/split_files/diffusion_models/z_image_bf16.safetensors",
+            "directory": "diffusion_models"
+          }
+        ],
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        "z_image_bf16.safetensors",
+        "default"
+      ]
+    },
+    {
+      "id": 71,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -368.70857104276064,
+        271.8011068785398
+      ],
+      "size": [
+        390,
+        125
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 82
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            83
+          ]
+        }
+      ],
+      "title": "CLIP Text Encode (Negative Prompt)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.73",
+        "Node name for S&R": "CLIPTextEncode",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        ""
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 89,
+      "type": "ImageScaleToTotalPixels",
+      "pos": [
+        -1204.8388714585756,
+        128.6569173097579
+      ],
+      "size": [
+        265.9438397889421,
+        107.84269318079225
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 103
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            104
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.0",
+        "Node name for S&R": "ImageScaleToTotalPixels"
+      },
+      "widgets_values": [
+        "nearest-exact",
+        1,
+        1
+      ]
+    },
+    {
+      "id": 70,
+      "type": "ModelSamplingAuraFlow",
+      "pos": [
+        -53.78181245339407,
+        -169.79967567768503
+      ],
+      "size": [
+        306.2987879944176,
+        59.67517561890202
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 71
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "slot_index": 0,
+          "links": [
+            74
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.64",
+        "Node name for S&R": "ModelSamplingAuraFlow",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        3
+      ]
+    },
+    {
+      "id": 65,
+      "type": "VAEDecode",
+      "pos": [
+        -43.31262592545611,
+        -53.27860740322445
+      ],
+      "size": [
+        307.1613105998488,
+        46
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 72
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 73
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            89
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.64",
+        "Node name for S&R": "VAEDecode",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 80,
+      "type": "PreviewImage",
+      "pos": [
+        -1206.597372921731,
+        292.57859401986843
+      ],
+      "size": [
+        265.79929014298534,
+        259.84269318079214
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 95
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.0",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 76,
+      "type": "MMXSimplePromptResolution",
+      "pos": [
+        -381.94515133648093,
+        331.1177439557664
+      ],
+      "size": [
+        288.8919661891067,
+        244
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 108
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            88
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            86
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "7e67126b953b9ac227607a696e1beb1e7ba7ea11",
+        "Node name for S&R": "MMXSimplePromptResolution"
+      },
+      "widgets_values": [
+        "这是一幅清新庭院入口的环境肖像。画面以白墙与木门构成干净的背景，左侧盛开的绣球花以蓝紫为主色，花团紧密，呈现单元状叠层的质感，形成前景的自然框架。镜头采用中景距，主角的身影处于门廊开启的门口线位置，给观者一种“进入”的动势。主体为一位亚洲成年女性，年龄约二十多岁，穿淡蓝色衬衫搭配米白色及膝半裙，脚踩奶油色高跟鞋，双手轻握花篮，花篮内摆放粉色、白色及橙黄系花卉，篮上系细绳。背景的木门、墙柱和黑色复古壁灯形成对称的垂直线条，与攀爬的绿藤相映成趣，增添层次感。花篮与衣着的柔和色调彼此呼应，整个画面呈现出暖色调的自然光效与细腻的阴影，表现出安静、优雅的居家花园氛围。",
+        "4:3 (Landscape)",
+        1024,
+        2048,
+        1
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 69,
+      "type": "KSampler",
+      "pos": [
+        -41.69591710238626,
+        79.28801716632393
+      ],
+      "size": [
+        311.6752459128727,
+        262
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 74
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 75
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 83
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 86
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            72
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.64",
+        "Node name for S&R": "KSampler",
+        "enableTabs": false,
+        "tabWidth": 65,
+        "tabXOffset": 10,
+        "hasSecondTab": false,
+        "secondTabText": "Send Back",
+        "secondTabOffset": 80,
+        "secondTabWidth": 65
+      },
+      "widgets_values": [
+        335654337234995,
+        "fixed",
+        50,
+        4,
+        "res_multistep",
+        "simple",
+        1
+      ]
+    },
+    {
+      "id": 79,
+      "type": "Gemini3Vision",
+      "pos": [
+        -807.0193833688082,
+        -165.08981777660918
+      ],
+      "size": [
+        298.4770491701156,
+        315.2765707418189
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 104
+        },
+        {
+          "name": "api_key",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "api_key"
+          },
+          "link": 105
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            102,
+            108
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "7e67126b953b9ac227607a696e1beb1e7ba7ea11",
+        "Node name for S&R": "Gemini3Vision"
+      },
+      "widgets_values": [
+        "你是一个专业视觉识别助手，为我识别图像，使用专业的摄影术语来描述图像内容，如出现人物，请设定亚洲人种、年龄，仅回复图像内容，不要回复其他内容。",
+        "详细描述图像内容，300字",
+        "gpt-5-nano-2025-08-07",
+        "https://ai.t8star.cn/v1/chat/completions",
+        1290831714,
+        "randomize",
+        4096,
+        0.7,
+        ""
+      ]
+    },
+    {
+      "id": 91,
+      "type": "PrimitiveString",
+      "pos": [
+        -785.4123801366306,
+        -398.6559426353107
+      ],
+      "size": [
+        279.9856175886025,
+        59.88784994843547
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            105
+          ]
+        }
+      ],
+      "title": "key",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.11.0",
+        "Node name for S&R": "PrimitiveString"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 72,
+      "type": "MarkdownNote",
+      "pos": [
+        -31.623218964160102,
+        462.77136341461465
+      ],
+      "size": [
+        300,
+        88
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Settings",
+      "properties": {},
+      "widgets_values": [
+        "- Steps: 30～50\n- cfg:  4～7"
+      ],
+      "color": "#222",
+      "bgcolor": "#000"
+    },
+    {
+      "id": 77,
+      "type": "save2JPG_mmx",
+      "pos": [
+        318.92029776319765,
+        -142.39213787000753
+      ],
+      "size": [
+        727.3275395421292,
+        708.351701423528
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 89
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt_text",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "jpg_path",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "7e67126b953b9ac227607a696e1beb1e7ba7ea11",
+        "Node name for S&R": "save2JPG_mmx"
+      },
+      "widgets_values": [
+        "Aiya/%Aiya:yyyyMMdd%-Aiya/%Aiya:yyyyMMdd%_img-Aiya-",
+        95,
+        true,
+        false,
+        false
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    }
+  ],
+  "links": [
+    [
+      71,
+      66,
+      0,
+      70,
+      0,
+      "MODEL"
+    ],
+    [
+      72,
+      69,
+      0,
+      65,
+      0,
+      "LATENT"
+    ],
+    [
+      73,
+      63,
+      0,
+      65,
+      1,
+      "VAE"
+    ],
+    [
+      74,
+      70,
+      0,
+      69,
+      0,
+      "MODEL"
+    ],
+    [
+      75,
+      67,
+      0,
+      69,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      78,
+      62,
+      0,
+      67,
+      0,
+      "CLIP"
+    ],
+    [
+      82,
+      62,
+      0,
+      71,
+      0,
+      "CLIP"
+    ],
+    [
+      83,
+      71,
+      0,
+      69,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      86,
+      76,
+      3,
+      69,
+      3,
+      "LATENT"
+    ],
+    [
+      88,
+      76,
+      0,
+      67,
+      1,
+      "STRING"
+    ],
+    [
+      89,
+      65,
+      0,
+      77,
+      0,
+      "IMAGE"
+    ],
+    [
+      95,
+      85,
+      0,
+      80,
+      0,
+      "IMAGE"
+    ],
+    [
+      102,
+      79,
+      0,
+      87,
+      0,
+      "STRING"
+    ],
+    [
+      103,
+      85,
+      0,
+      89,
+      0,
+      "IMAGE"
+    ],
+    [
+      104,
+      89,
+      0,
+      79,
+      0,
+      "IMAGE"
+    ],
+    [
+      105,
+      91,
+      0,
+      79,
+      1,
+      "STRING"
+    ],
+    [
+      108,
+      79,
+      0,
+      76,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.59304990848472,
+      "offset": [
+        1588.1012984278993,
+        776.3877381051375
+      ]
+    },
+    "frontendVersion": "1.37.11",
+    "workflowRendererVersion": "LG",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
