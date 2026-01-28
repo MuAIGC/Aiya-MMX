@@ -1,9 +1,12 @@
 # ~/ComfyUI/custom_nodes/Aiya_mmx/nodes/img_tools.py
 from __future__ import annotations
 import os
+import re
 import json
 import uuid
+import time
 from pathlib import Path
+from typing import List, Optional
 
 import numpy as np
 import torch
@@ -102,7 +105,6 @@ class save2JPG_mmx:
         for node in prompt.values():
             if isinstance(node, dict) and isinstance(node.get("inputs"), dict):
                 t = node["inputs"].get("prompt")
-                # 只处理字符串，跳过 list / None
                 if isinstance(t, str) and t.strip():
                     texts.append(t.strip())
         return "\n".join(texts)
@@ -213,9 +215,273 @@ class ImageSplitGrid_mmx:
         return tuple(result)
 
 # --------------------------------------------------
+#  5. 批量目录图片读取器  ImageFolderLoader_mmx
+# --------------------------------------------------
+class ImageFolderLoader_mmx:
+    """
+    💕 哎呀✦MMX/批量图片目录读取器
+    
+    【功能说明】
+    • 自动扫描指定目录的所有图片，按文件名排序后顺序读取
+    • 支持批量输出（最多9张）和单张输出
+    • 读取进度自动记忆，每次运行前进指定步数
+    • 跨平台支持：Windows路径(D:\img)和Linux路径(/mnt/img)均可
+    
+    【批次输出模式】
+    • 保持原始比例：使用黑边填充(Letterbox)而非拉伸，避免图像变形
+    • 统一尺寸：以批次第一张图为基准尺寸，其余图片等比缩放后居中填充
+    """
+    
+    DESCRIPTION = (
+        "💕 哎呀✦MMX —— 批量目录图片读取器 | "
+        "Letterbox无拉伸批次输出 | 支持Win/Linux路径 | 进度自动记忆"
+    )
+    
+    _path_cache: dict = {}
+    _state_cache: dict = {}
+    MAX_BATCH = 9
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "directory": ("STRING", { 
+                    "default": "", 
+                    "placeholder": "D:\\Photos\\input 或 /mnt/data/images",
+                    "tooltip": "📁 图片所在目录的完整路径\n"
+                               "• Windows示例: D:\\\\Photos\\\\input 或 D:/Photos/input\n"
+                               "• Linux示例: /mnt/data/images\n"
+                               "• 支持使用 ~ 表示用户主目录"
+                }),
+                "batch_count": ("INT", {
+                    "default": 1, 
+                    "min": 1, 
+                    "max": cls.MAX_BATCH, 
+                    "step": 1,
+                    "tooltip": "📦 每次运行输出的图片数量（1-9张）\n"
+                               "• 设为1：单张顺序读取模式\n"
+                               "• 设为4：每次输出4张图组成的批次\n"
+                               "批次内所有图将统一尺寸，但保持原始比例（黑边填充）"
+                }),
+                "step": ("INT", {
+                    "default": 1, 
+                    "min": 1, 
+                    "max": 100, 
+                    "step": 1,
+                    "tooltip": "🚶 每次运行后索引前进的步数\n"
+                               "• step=1：顺序连续读取（1,2,3...）\n"
+                               "• step=2：隔一张读取（1,3,5...），产生重叠或跳跃效果\n"
+                               "注意：step可以大于batch_count实现跳跃，也可以小于实现重叠"
+                }),
+                "reset": ("BOOLEAN", {
+                    "default": False, 
+                    "label_on": "🔄 重置", 
+                    "label_off": "⏩ 继续",
+                    "tooltip": "• 勾选：下次运行回到第一张图（索引归零）\n"
+                               "• 不勾选：从上次记住的位置继续读取"
+                }),
+                "loop": ("BOOLEAN", {
+                    "default": True, 
+                    "label_on": "🔁 循环", 
+                    "label_off": "⏹️ 停止",
+                    "tooltip": "• 循环开启：读到末尾后回到开头继续\n"
+                               "• 循环关闭：读到末尾后停留在最后一张"
+                }),
+            },
+            "optional": {
+                "file_pattern": ("STRING", {
+                    "default": "*", 
+                    "placeholder": "通配符如 *.jpg 或 frame_*.png",
+                    "tooltip": "🔍 文件名过滤通配符（glob模式）\n"
+                               "• * 或 *.*：加载所有图片（默认）\n"
+                               "• *.jpg：只加载jpg格式\n"
+                               "• frame_*.png：只加载frame_前缀的png\n"
+                               "• img_??.jpg：加载img_01.jpg, img_02.jpg等"
+                }),
+            },
+            "hidden": {"unique_id": "UNIQUE_ID"}
+        }
+
+    RETURN_TYPES = ("IMAGE", "IMAGE", "STRING", "INT", "INT")
+    RETURN_NAMES = ("single_image", "batch", "current_file", "current_index", "total_files")
+    FUNCTION = "load_images"
+    CATEGORY = "哎呀✦MMX/图像/批量"
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        """强制每次重新执行，避免ComfyUI缓存导致不读取下一张"""
+        return time.time()
+
+    def collect_images_letterbox(self, tensors: List[torch.Tensor]) -> torch.Tensor:
+        """
+        将多张图片合并为批次，使用Letterbox（黑边填充）保持原始比例
+        避免直接拉伸导致的图像变形
+        """
+        if not tensors:
+            raise RuntimeError("ImageFolderLoader_mmx: 没有可合并的图片")
+        
+        target_h, target_w = tensors[0].shape[1], tensors[0].shape[2]
+        target_c = tensors[0].shape[3]
+        
+        processed = []
+        for i, img in enumerate(tensors):
+            _, h, w, c = img.shape
+            
+            if h == target_h and w == target_w:
+                processed.append(img)
+                continue
+            
+            scale = min(target_h / h, target_w / w)
+            new_h = int(h * scale)
+            new_w = int(w * scale)
+            
+            img_ncwh = img.permute(0, 3, 1, 2)
+            img_resized = torch.nn.functional.interpolate(
+                img_ncwh,
+                size=(new_h, new_w), 
+                mode="bilinear", 
+                align_corners=False
+            )
+            
+            letterbox = torch.zeros((1, target_c, target_h, target_w), dtype=img.dtype)
+            pad_top = (target_h - new_h) // 2
+            pad_left = (target_w - new_w) // 2
+            letterbox[:, :, pad_top:pad_top+new_h, pad_left:pad_left+new_w] = img_resized
+            img_final = letterbox.permute(0, 2, 3, 1)
+            processed.append(img_final)
+            
+            if i > 0:
+                print(f"[ImageFolderLoader_mmx] 图{i+1}尺寸调整: {h}x{w} -> 保持比例缩放至 {new_h}x{new_w} "
+                      f"并填充至 {target_h}x{target_w}")
+        
+        batch = torch.cat(processed, dim=0)
+        return batch
+
+    def load_image_safe(self, path: Path) -> Optional[torch.Tensor]:
+        """安全加载单张图片并转为 tensor [1,H,W,C]"""
+        try:
+            img = Image.open(path)
+            if img.mode == 'RGBA':
+                background = Image.new('RGB', img.size, (0, 0, 0))
+                background.paste(img, mask=img.split()[3])
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            img_array = np.array(img).astype(np.float32) / 255.0
+            tensor = torch.from_numpy(img_array).unsqueeze(0)
+            return tensor
+        except Exception as e:
+            print(f"[ImageFolderLoader_mmx] 加载失败 {path}: {e}")
+            return None
+
+    def get_image_files(self, directory: str, pattern: str) -> List[Path]:
+        """获取目录下所有图片文件，支持缓存和自然排序"""
+        dir_path = Path(directory).expanduser().resolve()
+        cache_key = f"{dir_path}_{pattern}"
+        
+        if cache_key in self._path_cache:
+            return self._path_cache[cache_key]
+        
+        if not dir_path.exists():
+            raise FileNotFoundError(f"目录不存在: {dir_path}")
+        if not dir_path.is_dir():
+            raise NotADirectoryError(f"路径不是目录: {dir_path}")
+        
+        valid_exts = {'.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff', '.gif'}
+        
+        if pattern in ("", "*", "*.*"):
+            files = [f for f in dir_path.iterdir() if f.is_file() and f.suffix.lower() in valid_exts]
+        else:
+            files = list(dir_path.glob(pattern))
+            files = [f for f in files if f.is_file() and f.suffix.lower() in valid_exts]
+        
+        def natural_key(p: Path):
+            return [int(s) if s.isdigit() else s.lower() for s in re.split(r'(\d+)', p.name)]
+        
+        files.sort(key=natural_key)
+        
+        if not files:
+            raise RuntimeError(f"目录中未找到图片文件: {dir_path} (pattern: {pattern})")
+        
+        self._path_cache[cache_key] = files
+        print(f"[ImageFolderLoader_mmx] 📂 扫描到 {len(files)} 张图片: {dir_path}")
+        if len(files) <= 5:
+            print(f"[ImageFolderLoader_mmx]   列表: {[f.name for f in files]}")
+        return files
+
+    def load_images(self, directory: str, batch_count: int, step: int, 
+                   reset: bool, loop: bool, file_pattern: str = "*", 
+                   unique_id: str = None):
+        if not directory.strip():
+            raise ValueError("directory 不能为空")
+        
+        state_key = str(unique_id) if unique_id else "default"
+        image_files = self.get_image_files(directory, file_pattern)
+        total = len(image_files)
+        
+        if reset or state_key not in self._state_cache:
+            current_idx = 0
+            print(f"[ImageFolderLoader_mmx] [{state_key}] 🔄 重置索引 | 共 {total} 张")
+        else:
+            current_idx = self._state_cache[state_key]
+            if current_idx >= total:
+                current_idx = 0 if loop else total - 1
+        
+        if current_idx >= total:
+            if loop:
+                current_idx = 0
+        
+        selected_files = []
+        indices = []
+        for i in range(batch_count):
+            idx = current_idx + i
+            if idx >= total:
+                if loop:
+                    idx = idx % total
+                else:
+                    break
+            indices.append(idx)
+            selected_files.append(image_files[idx])
+        
+        if not selected_files:
+            raise RuntimeError("没有可选的图片，请检查索引设置和循环选项")
+        
+        tensors = []
+        for fp in selected_files:
+            t = self.load_image_safe(fp)
+            if t is not None:
+                tensors.append(t)
+        
+        if not tensors:
+            raise RuntimeError("本次批次中所有图片加载失败")
+        
+        single_image = tensors[0]
+        
+        if len(tensors) == 1:
+            batch = tensors[0]
+        else:
+            batch = self.collect_images_letterbox(tensors)
+        
+        next_idx = current_idx + step
+        if loop:
+            next_idx = next_idx % total
+        else:
+            next_idx = min(next_idx, total - 1)
+        
+        self._state_cache[state_key] = next_idx
+        current_filename = selected_files[0].name if selected_files else ""
+        
+        print(f"[ImageFolderLoader_mmx] [{state_key}] ✅ 读取 [{current_idx}/{total}] {current_filename} | "
+              f"批次 {len(tensors)} 张 | 步进 +{step} -> 下一位置 {next_idx}")
+        
+        return (single_image, batch, current_filename, current_idx, total)
+
+# --------------------------------------------------
 #  统一注册
 # --------------------------------------------------
 register_node(ImageBatchCollector_mmx, "ImageBatchCollector_mmx")
 register_node(save2JPG_mmx, "save2JPG_mmx")
 register_node(LoadImageFromPath_mmx, "LoadImageFromPath_mmx")
 register_node(ImageSplitGrid_mmx, "ImageSplitGrid_mmx")
+register_node(ImageFolderLoader_mmx, "ImageFolderLoader_mmx")
