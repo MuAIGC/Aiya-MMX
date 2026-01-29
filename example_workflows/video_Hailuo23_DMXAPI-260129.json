@@ -1,54 +1,9 @@
 {
   "id": "9712da5a-170e-4496-930f-7c7228e614e8",
   "revision": 0,
-  "last_node_id": 84,
-  "last_link_id": 156,
+  "last_node_id": 86,
+  "last_link_id": 164,
   "nodes": [
-    {
-      "id": 16,
-      "type": "DownloadVideo",
-      "pos": [
-        156.21753958245165,
-        2996.185793795536
-      ],
-      "size": [
-        270,
-        106
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 25,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "download_url",
-          "type": "STRING",
-          "widget": {
-            "name": "download_url"
-          },
-          "link": 156
-        }
-      ],
-      "outputs": [
-        {
-          "name": "video",
-          "type": "VIDEO",
-          "links": [
-            21,
-            27
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "DownloadVideo"
-      },
-      "widgets_values": [
-        "",
-        "%Aiya:yyyyMMdd%",
-        300
-      ]
-    },
     {
       "id": 25,
       "type": "SaveVideo",
@@ -69,7 +24,7 @@
         {
           "name": "video",
           "type": "VIDEO",
-          "link": 28
+          "link": 160
         }
       ],
       "outputs": [],
@@ -104,7 +59,7 @@
         {
           "name": "source",
           "type": "*",
-          "link": 24
+          "link": 162
         }
       ],
       "outputs": [],
@@ -139,7 +94,7 @@
         {
           "name": "source",
           "type": "*",
-          "link": 25
+          "link": 163
         }
       ],
       "outputs": [],
@@ -168,13 +123,13 @@
       "flags": {
         "pinned": true
       },
-      "order": 27,
+      "order": 26,
       "mode": 4,
       "inputs": [
         {
           "name": "video",
           "type": "VIDEO",
-          "link": 27
+          "link": 157
         }
       ],
       "outputs": [],
@@ -209,7 +164,7 @@
         {
           "name": "source",
           "type": "*",
-          "link": 23
+          "link": 161
         }
       ],
       "outputs": [],
@@ -222,66 +177,6 @@
         null,
         null,
         null
-      ]
-    },
-    {
-      "id": 19,
-      "type": "AiyaMMXVideoToPath",
-      "pos": [
-        156.0613701507133,
-        3411.313866786881
-      ],
-      "size": [
-        279.808203125,
-        118
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 26,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "video",
-          "type": "VIDEO",
-          "link": 21
-        }
-      ],
-      "outputs": [
-        {
-          "name": "video",
-          "type": "VIDEO",
-          "links": [
-            28
-          ]
-        },
-        {
-          "name": "file_path",
-          "type": "STRING",
-          "links": [
-            23
-          ]
-        },
-        {
-          "name": "width",
-          "type": "INT",
-          "links": [
-            24
-          ]
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "links": [
-            25
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "AiyaMMXVideoToPath"
-      },
-      "widgets_values": [
-        false
       ]
     },
     {
@@ -500,6 +395,8 @@
         }
       ],
       "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "b2ee45f5def423d67c4714c3dfd53d06487e9467",
         "Node name for S&R": "AiyaHailuo23DMX"
       },
       "widgets_values": [
@@ -875,7 +772,7 @@
           "type": "STRING",
           "links": [
             151,
-            156
+            158
           ]
         }
       ],
@@ -1057,6 +954,8 @@
         }
       ],
       "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "b2ee45f5def423d67c4714c3dfd53d06487e9467",
         "Node name for S&R": "Hailuo23Image2Video"
       },
       "widgets_values": [
@@ -1131,6 +1030,8 @@
         }
       ],
       "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "b2ee45f5def423d67c4714c3dfd53d06487e9467",
         "Node name for S&R": "Hailuo23FirstLast2Video"
       },
       "widgets_values": [
@@ -1284,57 +1185,114 @@
       "widgets_values": [
         ""
       ]
+    },
+    {
+      "id": 85,
+      "type": "DownloadVideo_mmx",
+      "pos": [
+        160.1099053974935,
+        3046.736343226738
+      ],
+      "size": [
+        302.0796875,
+        106
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "download_url",
+          "type": "STRING",
+          "widget": {
+            "name": "download_url"
+          },
+          "link": 158
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            157,
+            164
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "b2ee45f5def423d67c4714c3dfd53d06487e9467",
+        "Node name for S&R": "DownloadVideo_mmx"
+      },
+      "widgets_values": [
+        "",
+        "Aiya/%Aiya:yyyyMMdd%/download",
+        300
+      ]
+    },
+    {
+      "id": 86,
+      "type": "VideoToPath_mmx",
+      "pos": [
+        203.56456430741093,
+        3402.7396731283366
+      ],
+      "size": [
+        280.655859375,
+        118
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 164
+        }
+      ],
+      "outputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "links": [
+            160
+          ]
+        },
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": [
+            161
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            162
+          ]
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            163
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "MuAIGC/ComfyUI-Aiya-MMX",
+        "ver": "b2ee45f5def423d67c4714c3dfd53d06487e9467",
+        "Node name for S&R": "VideoToPath_mmx"
+      },
+      "widgets_values": [
+        false
+      ]
     }
   ],
   "links": [
-    [
-      21,
-      16,
-      0,
-      19,
-      0,
-      "VIDEO"
-    ],
-    [
-      23,
-      19,
-      1,
-      21,
-      0,
-      "STRING"
-    ],
-    [
-      24,
-      19,
-      2,
-      22,
-      0,
-      "INT"
-    ],
-    [
-      25,
-      19,
-      3,
-      23,
-      0,
-      "INT"
-    ],
-    [
-      27,
-      16,
-      0,
-      24,
-      0,
-      "VIDEO"
-    ],
-    [
-      28,
-      19,
-      0,
-      25,
-      0,
-      "VIDEO"
-    ],
     [
       49,
       12,
@@ -1504,12 +1462,60 @@
       "STRING"
     ],
     [
-      156,
+      157,
+      85,
+      0,
+      24,
+      0,
+      "VIDEO"
+    ],
+    [
+      158,
       77,
       0,
-      16,
+      85,
       0,
       "STRING"
+    ],
+    [
+      160,
+      86,
+      0,
+      25,
+      0,
+      "VIDEO"
+    ],
+    [
+      161,
+      86,
+      1,
+      21,
+      0,
+      "STRING"
+    ],
+    [
+      162,
+      86,
+      2,
+      22,
+      0,
+      "INT"
+    ],
+    [
+      163,
+      86,
+      3,
+      23,
+      0,
+      "INT"
+    ],
+    [
+      164,
+      85,
+      0,
+      86,
+      0,
+      "VIDEO"
     ]
   ],
   "groups": [
@@ -1569,14 +1575,14 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.5989500000000068,
+      "scale": 0.45000000000000595,
       "offset": [
-        1279.5931532661195,
-        -1205.6019297425842
+        1469.4315171222927,
+        -1213.3958494901262
       ]
     },
     "workflowRendererVersion": "LG",
-    "frontendVersion": "1.34.8",
+    "frontendVersion": "1.37.11",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
