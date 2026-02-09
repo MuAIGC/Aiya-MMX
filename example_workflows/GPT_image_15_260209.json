@@ -2,7 +2,7 @@
   "id": "c723ab08-196e-4c87-8683-9cb6e88c03f6",
   "revision": 0,
   "last_node_id": 200,
-  "last_link_id": 280,
+  "last_link_id": 284,
   "nodes": [
     {
       "id": 174,
@@ -65,8 +65,8 @@
           "name": "STRING",
           "type": "STRING",
           "links": [
-            248,
-            280
+            282,
+            284
           ]
         }
       ],
@@ -108,33 +108,6 @@
       ],
       "color": "#432",
       "bgcolor": "#653"
-    },
-    {
-      "id": 180,
-      "type": "MarkdownNote",
-      "pos": [
-        3412.5390352700797,
-        10484.151308207895
-      ],
-      "size": [
-        286.4956799960904,
-        242.86322833455802
-      ],
-      "flags": {
-        "collapsed": false,
-        "pinned": true
-      },
-      "order": 3,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "说明",
-      "properties": {},
-      "widgets_values": [
-        "# 模型选择\n---\n## gpt-image-1.5"
-      ],
-      "color": "#223",
-      "bgcolor": "#335"
     },
     {
       "id": 186,
@@ -284,7 +257,7 @@
           "widget": {
             "name": "model"
           },
-          "link": 248
+          "link": 282
         }
       ],
       "outputs": [
@@ -311,9 +284,9 @@
         "https://ai.t8star.cn/v1/images/generations",
         "",
         "",
-        "gpt-image-1.5",
+        "",
         "1024x1536 (竖版)",
-        3,
+        1,
         "auto (自动)",
         "auto (自动)",
         "jpeg",
@@ -366,7 +339,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 4,
+      "order": 3,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -404,7 +377,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 5,
+      "order": 4,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -440,7 +413,7 @@
         326
       ],
       "flags": {},
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -515,7 +488,7 @@
         118.55295009572137
       ],
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -551,7 +524,7 @@
         326
       ],
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -606,6 +579,107 @@
         "Node name for S&R": "PreviewImage"
       },
       "widgets_values": []
+    },
+    {
+      "id": 182,
+      "type": "PrimitiveStringMultiline",
+      "pos": [
+        4012.818203439743,
+        9883.861183340297
+      ],
+      "size": [
+        449.90273577260876,
+        231.61081142384637
+      ],
+      "flags": {
+        "pinned": true
+      },
+      "order": 8,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            247
+          ]
+        }
+      ],
+      "title": "提示词",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.76",
+        "Node name for S&R": "PrimitiveStringMultiline"
+      },
+      "widgets_values": [
+        "这张照片采用了这幅极具视觉冲击力的杰作，展现了一位气质超脱的东方女性在宏伟宫廷背景下的绝美风华。这是一幅融合了电影级光影、极致写实纹理与深厚文化底蕴的8K超清数字艺术摄影。构图采用了经典的人像中景景别，利用大光圈定焦镜头产生的极浅景深，将后方雄浑的唐风建筑群巧妙地转化为柔美且具有叙事感的焦外虚化，使得主体人物在青砖地面的延伸线中脱颖而出。光影艺术在此得到了巅峰体现：侧逆光位的自然光如金色的薄纱，细腻地勾勒出人物面部的三维轮廓，特别是在鼻梁与下颌线处形成了柔和的过渡阴影，展现了皮肤微小的毛孔质感与半透明的皮下散射（Subsurface Scattering）效果。人物所穿的深蓝色齐胸襦裙是视觉的核心，面料采用了高克重的真丝绸缎，其表面的金色缂丝团花图案在光线下流转着金属质感的光泽，每一条金线的交织逻辑与丝绸的垂坠褶皱都经过了物理建模级别的精细刻画。那抹点睛之笔的明黄色披帛，其轻盈的质感与深色主裙形成了鲜明的明度对比，增强了画面的视觉张力。在妆发设计上，完美复刻了盛唐时期的繁复美学，高耸的云髻结构严谨，发丝分明，点缀其间的红玛瑙步摇与错金发簪在微光下闪烁，与人物淡雅的远山黛眉及复古朱唇妆容相得益彰，散发出一种高贵而内敛的古典气韵。背景中的宫殿建筑以低饱和度的青灰色调呈现，其古朴的木质结构与石材纹理在虚化中依然保留了历史的厚重感，与前景人物的华丽形成了跨越时空的对话。画面的后期调色采用了好莱坞级别的电影工业级色彩分级（Color Grading），冷暖色调在暗部与高光间微妙平衡，呈现出一种永恒的、博物馆级别的画作质感。这不仅是一张照片，更是一场关于东方美学、摄影光学与现代数字图像技术的深度融合，每一处像素都透露着极致的匠心与对细节的绝对掌控。"
+      ],
+      "color": "#233",
+      "bgcolor": "#355"
+    },
+    {
+      "id": 187,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        3700.559083245515,
+        9821.168980653481
+      ],
+      "size": [
+        210,
+        106
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "label": "可选连接",
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "节点开关",
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "",
+        "showNav": true,
+        "showAllGraphs": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 180,
+      "type": "MarkdownNote",
+      "pos": [
+        3412.5390352700797,
+        10484.151308207895
+      ],
+      "size": [
+        286.4956799960904,
+        242.86322833455802
+      ],
+      "flags": {
+        "collapsed": false,
+        "pinned": true
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "说明",
+      "properties": {},
+      "widgets_values": [
+        "# 模型选择\n---\n## gpt-image-1.5\n\n## sora_image\n\n## gpt-4o-image"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
     },
     {
       "id": 198,
@@ -748,7 +822,7 @@
           "widget": {
             "name": "model"
           },
-          "link": 280
+          "link": 284
         }
       ],
       "outputs": [
@@ -774,7 +848,7 @@
         "https://ai.t8star.cn/v1/images/edits",
         "",
         "给人物添加一副墨镜，保持风格一致",
-        "gpt-image-1.5",
+        "",
         "1024x1536 (竖版)",
         "auto (自动)",
         "auto (自动)",
@@ -782,80 +856,6 @@
         90,
         "high (高保真)"
       ]
-    },
-    {
-      "id": 182,
-      "type": "PrimitiveStringMultiline",
-      "pos": [
-        4012.818203439743,
-        9883.861183340297
-      ],
-      "size": [
-        449.90273577260876,
-        231.61081142384637
-      ],
-      "flags": {
-        "pinned": true
-      },
-      "order": 9,
-      "mode": 4,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            247
-          ]
-        }
-      ],
-      "title": "提示词",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.76",
-        "Node name for S&R": "PrimitiveStringMultiline"
-      },
-      "widgets_values": [
-        "这张照片采用了这幅极具视觉冲击力的杰作，展现了一位气质超脱的东方女性在宏伟宫廷背景下的绝美风华。这是一幅融合了电影级光影、极致写实纹理与深厚文化底蕴的8K超清数字艺术摄影。构图采用了经典的人像中景景别，利用大光圈定焦镜头产生的极浅景深，将后方雄浑的唐风建筑群巧妙地转化为柔美且具有叙事感的焦外虚化，使得主体人物在青砖地面的延伸线中脱颖而出。光影艺术在此得到了巅峰体现：侧逆光位的自然光如金色的薄纱，细腻地勾勒出人物面部的三维轮廓，特别是在鼻梁与下颌线处形成了柔和的过渡阴影，展现了皮肤微小的毛孔质感与半透明的皮下散射（Subsurface Scattering）效果。人物所穿的深蓝色齐胸襦裙是视觉的核心，面料采用了高克重的真丝绸缎，其表面的金色缂丝团花图案在光线下流转着金属质感的光泽，每一条金线的交织逻辑与丝绸的垂坠褶皱都经过了物理建模级别的精细刻画。那抹点睛之笔的明黄色披帛，其轻盈的质感与深色主裙形成了鲜明的明度对比，增强了画面的视觉张力。在妆发设计上，完美复刻了盛唐时期的繁复美学，高耸的云髻结构严谨，发丝分明，点缀其间的红玛瑙步摇与错金发簪在微光下闪烁，与人物淡雅的远山黛眉及复古朱唇妆容相得益彰，散发出一种高贵而内敛的古典气韵。背景中的宫殿建筑以低饱和度的青灰色调呈现，其古朴的木质结构与石材纹理在虚化中依然保留了历史的厚重感，与前景人物的华丽形成了跨越时空的对话。画面的后期调色采用了好莱坞级别的电影工业级色彩分级（Color Grading），冷暖色调在暗部与高光间微妙平衡，呈现出一种永恒的、博物馆级别的画作质感。这不仅是一张照片，更是一场关于东方美学、摄影光学与现代数字图像技术的深度融合，每一处像素都透露着极致的匠心与对细节的绝对掌控。"
-      ],
-      "color": "#233",
-      "bgcolor": "#355"
-    },
-    {
-      "id": 187,
-      "type": "Fast Groups Bypasser (rgthree)",
-      "pos": [
-        3700.559083245515,
-        9821.168980653481
-      ],
-      "size": [
-        210,
-        106
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "label": "可选连接",
-          "name": "OPT_CONNECTION",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "title": "节点开关",
-      "properties": {
-        "matchColors": "",
-        "matchTitle": "",
-        "showNav": true,
-        "showAllGraphs": true,
-        "sort": "position",
-        "customSortAlphabet": "",
-        "toggleRestriction": "default"
-      },
-      "color": "#432",
-      "bgcolor": "#653"
     }
   ],
   "links": [
@@ -881,14 +881,6 @@
       0,
       183,
       2,
-      "STRING"
-    ],
-    [
-      248,
-      175,
-      0,
-      183,
-      3,
       "STRING"
     ],
     [
@@ -972,7 +964,15 @@
       "IMAGE"
     ],
     [
-      280,
+      282,
+      175,
+      0,
+      183,
+      3,
+      "STRING"
+    ],
+    [
+      284,
       175,
       0,
       198,
@@ -1012,10 +1012,10 @@
   "extra": {
     "workflowRendererVersion": "LG",
     "ds": {
-      "scale": 0.6209213230591553,
+      "scale": 0.5730855330116854,
       "offset": [
-        -2976.4731742296917,
-        -9518.5790609424
+        -3000.9125535846315,
+        -9518.339183496508
       ]
     },
     "frontendVersion": "1.37.11"
