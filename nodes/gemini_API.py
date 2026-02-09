@@ -7,6 +7,7 @@ import time
 import uuid
 import random
 import re
+import threading
 import requests
 import cv2
 import torch
@@ -15,8 +16,9 @@ from pathlib import Path
 from PIL import Image
 from datetime import datetime
 from ..register import register_node
-from ..mmx_utils import pil2tensor, tensor2pil   # 统一复用
-from ..video_adapter import Video               # Veo 需要
+from ..mmx_utils import pil2tensor, tensor2pil
+from ..video_adapter import Video 
+from .openai_API import _result_cache, _processing_events, _cache_lock, cache_result, get_result
 
 # ---------- 通用工具 ----------
 def tensor2pil_single(t: torch.Tensor) -> Image.Image:
@@ -124,6 +126,143 @@ class NanoBananaPro:
 
         info = f"🍌 NanoBanana {time.strftime('%Y-%m-%d %H:%M:%S')}\nendpoint: {endpoint_url}\nmodel: {model}\nratio: {aspect_ratio}  size: 2K\ninput: {cnt}  success: True"
         return (best, info)
+
+
+# ===================================================================
+#  1.2. Nano-Banana Pro 提交节点
+# ===================================================================
+class NanoBananaProSubmit:
+    DESCRIPTION = (
+        "💕 哎呀✦Nano-Banana Pro 提交 | 并发\n"
+        "14图输入、自动抽卡最大图，立即返回task_id"
+    )
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "endpoint_url": ("STRING", {
+                    "default": "https://ai.t8star.cn/v1/images/generations",
+                    "placeholder": "https://xxx/v1/images/generations"
+                }),
+                "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
+                "prompt": ("STRING", {"forceInput": True, "multiline": True}),
+                "aspect_ratio": (["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"], {"default": "1:1"}),
+                "model": ("STRING", {"default": "nano-banana-2"}),
+            },
+            "optional": {f"input_image_{i}": ("IMAGE",) for i in range(1, 15)}
+        }
+
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("task_id", "status")
+    FUNCTION = "submit"
+    CATEGORY = "哎呀✦MMX/图像"
+
+    def add_random(self, p: str) -> str:
+        return f"{p} [var-{random.randint(10000, 99999)}]"
+
+    def build_payload(self, prompt, imgs, ar, model: str):
+        """复用原逻辑构建请求体"""
+        port_map = {idx + 1: idx + 1 for idx, img in enumerate(imgs) if img is not None}
+        for port, arr in port_map.items():
+            prompt = re.sub(rf"图{port}(?!\d)", f"图{arr}", prompt)
+
+        parts = []
+        for img in imgs:
+            if img is not None:
+                buf = io.BytesIO()
+                tensor2pil_single(img).save(buf, format="PNG")
+                b64 = base64.b64encode(buf.getvalue()).decode()
+                parts.append({"image": b64})
+        parts.append({"text": self.add_random(prompt)})
+
+        payload = {
+            "model": model,
+            "prompt": parts[-1]["text"],
+            "aspect_ratio": ar,
+            "image_size": "2K",
+            "response_format": "url"
+        }
+        if parts[:-1]:
+            payload["image"] = [p["image"] for p in parts[:-1]]
+        return payload
+
+    def decode_biggest(self, urls):
+        """下载所有URL，返回最大尺寸的张量"""
+        decoded = []
+        for url in urls:
+            try:
+                if url.startswith("data:"):
+                    im = Image.open(io.BytesIO(base64.b64decode(url.split(",", 1)[1])))
+                else:
+                    im = Image.open(io.BytesIO(requests.get(url, timeout=60).content))
+                im = im.convert("RGB")
+                w, h = im.size
+                decoded.append((pil2tensor(im), w * h))
+            except Exception as e:
+                print(f"[NanoBananaSubmit] skip download: {e}")
+                continue
+        
+        if not decoded:
+            return None
+        
+        decoded.sort(key=lambda x: x[1], reverse=True)
+        best, _ = decoded[0]
+        return best
+
+    def submit(self, endpoint_url, api_key, prompt, aspect_ratio, model, **img_ports):
+        """生成task_id，启动后台线程，立即返回"""
+        if not api_key.strip():
+            return ("", "Error: API Key missing")
+
+        # 收集输入图（在线程外收集，避免线程内访问ComfyUI数据问题）
+        imgs = [img_ports.get(f"input_image_{i}") for i in range(1, 15)]
+        cnt = sum(1 for i in imgs if i is not None)
+        
+        # 生成唯一ID并注册等待事件
+        task_id = str(uuid.uuid4())
+        event = threading.Event()
+        with _cache_lock:
+            _processing_events[task_id] = event
+
+        # 后台任务
+        def worker():
+            try:
+                print(f"[NanoBananaSubmit] 后台开始 | task: {task_id[:8]} | 模型: {model} | 图: {cnt}张")
+                
+                payload = self.build_payload(prompt, imgs, aspect_ratio, model)
+                headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+                
+                resp = requests.post(endpoint_url, headers=headers, json=payload, timeout=180)
+                resp.raise_for_status()
+                
+                data = resp.json()
+                urls = [item["url"] for item in data.get("data", []) if "url" in item]
+                
+                if not urls:
+                    print(f"[NanoBananaSubmit] 后台 | task: {task_id[:8]} | API未返回图片")
+                    cache_result(task_id, None)
+                    return
+                
+                # 下载并选最大
+                best_tensor = self.decode_biggest(urls)
+                if best_tensor is not None:
+                    if best_tensor.dim() == 3:
+                        best_tensor = best_tensor.unsqueeze(0)
+                    cache_result(task_id, best_tensor)
+                    print(f"[NanoBananaSubmit] 后台完成 | task: {task_id[:8]} | 成功({best_tensor.shape})")
+                else:
+                    print(f"[NanoBananaSubmit] 后台完成 | task: {task_id[:8]} | 下载失败")
+                    cache_result(task_id, None)
+                    
+            except Exception as e:
+                print(f"[NanoBananaSubmit] 后台异常 | task: {task_id[:8]} | {e}")
+                cache_result(task_id, None)
+
+        # 启动后台线程并立即返回
+        threading.Thread(target=worker, daemon=True).start()
+        print(f"[NanoBananaSubmit] 已提交 | task_id: {task_id[:8]}... | 图片: {cnt}张")
+        return (task_id, "Submitted")
 
 
 # ===================================================================
@@ -363,5 +502,6 @@ class Veo3_1:
 #  统一注册
 # ===================================================================
 register_node(NanoBananaPro, "NanoBanana_Pro_mmx")
+register_node(NanoBananaProSubmit, "NanoBanana_Pro_Submit_mmx")
 register_node(Gemini3Vision, "Gemini3Vision_mmx")
 register_node(Veo3_1, "Veo3.1_mmx")
