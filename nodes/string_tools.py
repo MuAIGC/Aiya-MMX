@@ -169,6 +169,7 @@ class SaveText_mmx:
             "required": {
                 "text": ("STRING", {"default": "", "multiline": True}),
                 "filename_prefix": ("STRING", {"default": "Aiya/%Aiya:yyyyMMdd%/%Aiya:yyyyMMdd%_txt"}),
+                "cache_name": ("STRING", {"default": "default", "multiline": False}),  # 新增：与LoadText配对
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO", "unique_id": "UNIQUE_ID"},
         }
@@ -179,7 +180,7 @@ class SaveText_mmx:
     OUTPUT_NODE = True
     CATEGORY = "哎呀✦MMX/text"
 
-    def save_text(self, text, filename_prefix,
+    def save_text(self, text, filename_prefix, cache_name,  # 新增 cache_name 参数
                   prompt=None, extra_pnginfo=None, unique_id=None):
         # 1. 替换日期变量
         prefix = replace_date_vars(filename_prefix, safe_path=True)
@@ -200,10 +201,15 @@ class SaveText_mmx:
 
         # 5. 写文件 & 缓存
         save_path.write_text(text, encoding="utf-8")
-        cache_name = getattr(self, "cache_name", "default")
+        
+        # 修复：使用输入的 cache_name，而不是不存在的 self.cache_name
+        cache_name = (cache_name or "default").strip()
         cache_file = CACHE_DIR / f"{cache_name}.txtpath"
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
         cache_file.write_text(str(save_path), encoding="utf-8")
+        
+        print(f"[SaveText_mmx] 文件保存至: {save_path}")
+        print(f"[SaveText_mmx] 缓存写入: {cache_file} → {save_path}")
 
         return (str(save_path), text)
 
@@ -229,23 +235,30 @@ class LoadTextFromPath_mmx:
         path = path.strip()
         cache_name = cache_name.strip() or "default"
         cache_file = CACHE_DIR / f"{cache_name}.txtpath"
+        
+        print(f"[LoadTextFromPath_mmx] 输入path: '{path}' | cache_name: '{cache_name}'")
+        print(f"[LoadTextFromPath_mmx] 缓存文件位置: {cache_file}")
 
         # 空输入 → 读缓存
         if not path:
             if cache_file.exists():
-                path = cache_file.read_text(encoding="utf-8").strip()
-            if not path:
-                raise RuntimeError(f"LoadTextFromPath_mmx: 缓存「{cache_name}」为空！")
+                cached_path = cache_file.read_text(encoding="utf-8").strip()
+                print(f"[LoadTextFromPath_mmx] 从缓存读取路径: '{cached_path}'")
+                path = cached_path
+            else:
+                raise RuntimeError(f"LoadTextFromPath_mmx: 缓存「{cache_name}」不存在！缓存文件: {cache_file}")
+        
+        if not path:
+            raise RuntimeError(f"LoadTextFromPath_mmx: 缓存「{cache_name}」内容为空！请先用SaveText保存，或手动输入路径。")
 
-        # 非空输入 → 写缓存
-        else:
-            path = replace_date_vars(path)
-            CACHE_DIR.mkdir(parents=True, exist_ok=True)
-            cache_file.write_text(path, encoding="utf-8")
-
+        # 非空输入（且不是从缓存读的）→ 写缓存（可选，这里不做，保持只读语义清晰）
+        
         path = Path(path).expanduser().resolve()
+        print(f"[LoadTextFromPath_mmx] 最终解析路径: {path}")
+        
         if not path.exists():
-            raise FileNotFoundError(f"LoadTextFromPath_mmx: 文件不存在 → {path}")
+            raise FileNotFoundError(f"LoadTextFromPath_mmx: 文件不存在 → {path}\n"
+                                  f"（若使用缓存，请检查 {cache_file} 内容是否正确）")
 
         text = path.read_text(encoding="utf-8")
         return (text,)
