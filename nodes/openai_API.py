@@ -96,7 +96,7 @@ class GPTImageGenerate:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/generations"}),
+                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/generations "}),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "model": ("STRING", {"default": "gpt-image-1.5", "placeholder": "gpt-image-1.5"}),
@@ -290,7 +290,7 @@ class GPTImageEdit:
         
         return {
             "required": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/edits"}),
+                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/edits "}),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"multiline": True, "default": "给人物添加一副墨镜，保持风格一致"}),
                 "model": ("STRING", {"default": "gpt-image-1.5"}),
@@ -463,7 +463,7 @@ class GPTImageEdit:
 
 
 # ===================================================================
-#  3. 、GPT-Image 编辑提交节点
+#  3. GPT-Image 编辑提交节点
 # ===================================================================
 class GPTImageEditSubmit:
     DESCRIPTION = (
@@ -476,7 +476,7 @@ class GPTImageEditSubmit:
         optional_inputs = {f"reference_image_{i}": ("IMAGE",) for i in range(1, 17)}
         return {
             "required": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/edits"}),
+                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/edits "}),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "model": ("STRING", {"default": "gpt-image-1.5"}),
@@ -678,9 +678,315 @@ class GPTImageEditCollect:
 
 
 # ===================================================================
+#  5. SVG 生成节点
+# ===================================================================
+import re
+from pathlib import Path
+from PIL import ImageDraw, ImageFont
+import numpy as np
+
+def svg_extract_from_text(text: str) -> str:
+    """从API返回文本中提取SVG代码"""
+    if not text:
+        return ""
+    cleaned = re.sub(r'```svg\s*', '', text, flags=re.IGNORECASE)
+    cleaned = re.sub(r'```\s*$', '', cleaned)
+    cleaned = re.sub(r'```', '', cleaned).strip()
+    
+    svg_match = re.search(r'(<svg[^>]*>)', cleaned, re.IGNORECASE | re.DOTALL)
+    if svg_match:
+        start_idx = svg_match.start()
+        if start_idx > 5 and cleaned[start_idx-5:start_idx].find('?>') > -1:
+            xml_start = cleaned.rfind('<?xml', 0, start_idx)
+            if xml_start != -1:
+                start_idx = xml_start
+        cleaned = cleaned[start_idx:]
+    
+    end_match = re.search(r'</svg\s*>', cleaned, re.IGNORECASE)
+    if end_match:
+        cleaned = cleaned[:end_match.end()]
+    
+    if '<svg' in cleaned.lower() and '</svg>' in cleaned.lower():
+        return cleaned.strip()
+    return ""
+
+def svg_has_animation(svg_code: str) -> bool:
+    """检测SVG是否包含动画"""
+    indicators = ['<animate', '<animateTransform', 'animation:', '@keyframes', 'transition:']
+    return any(ind in svg_code.lower() for ind in indicators)
+
+def svg_to_tensor(svg_code: str, width: int = 512, height: int = 512):
+    """
+    SVG转PNG预览图（强制彩色输出）
+    依赖：pip install pymupdf (fitz)
+    """
+    if not svg_code or not svg_code.strip():
+        img = np.ones((height, width, 3), dtype=np.float32) * 0.95
+        return torch.from_numpy(img)
+    
+    # 方案1: PyMuPDF（强制RGB彩色）
+    try:
+        import fitz
+        doc = fitz.open(stream=svg_code.encode('utf-8'), filetype="svg")
+        page = doc[0]
+        rect = page.rect
+        
+        if rect.width > 0 and rect.height > 0:
+            zoom = min(width / rect.width, height / rect.height)
+            mat = fitz.Matrix(zoom, zoom)
+        else:
+            mat = fitz.Matrix(1, 1)
+        
+        pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB, alpha=False)
+        
+        if pix.n == 3:
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        elif pix.n == 4:
+            img = Image.frombytes("RGBA", [pix.width, pix.height], pix.samples).convert("RGB")
+        else:
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.tobytes("png"))
+        
+        doc.close()
+        
+        if img.width != width or img.height != height:
+            img = img.resize((width, height), Image.Resampling.LANCZOS)
+        
+        return pil2tensor(img)
+    except Exception as e:
+        print(f"[SVG] PyMuPDF渲染失败(安装pymupdf获得最佳效果): {e}")
+    
+    # 方案2: cairosvg（备用）
+    try:
+        import cairosvg
+        png_data = cairosvg.svg2png(
+            bytestring=svg_code.encode('utf-8'),
+            output_width=width,
+            output_height=height,
+            background_color='white'
+        )
+        return pil2tensor(Image.open(io.BytesIO(png_data)).convert('RGB'))
+    except:
+        pass
+    
+    # 方案3: 彩色代码截图（降级）
+    pil_img = Image.new('RGB', (width, height), color=(30, 30, 30))
+    draw = ImageDraw.Draw(pil_img)
+    try:
+        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 10)
+        header_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
+    except:
+        font = ImageFont.load_default()
+        header_font = font
+    
+    draw.rectangle([0, 0, width, 26], fill=(40, 90, 140))
+    draw.text((8, 5), "SVG Preview (Install PyMuPDF)", fill=(255, 255, 255), font=header_font)
+    
+    lines = svg_code.split('\n')[:40]
+    y_pos = 32
+    for i, line in enumerate(lines):
+        if y_pos > height - 12:
+            break
+        color = (200, 200, 200)
+        if line.strip().startswith('<'):
+            color = (100, 180, 255)
+        elif '=' in line:
+            color = (255, 180, 80)
+        draw.text((8, y_pos), line[:100], fill=color, font=font)
+        y_pos += 12
+    
+    return pil2tensor(pil_img)
+
+def tensor_to_base64(tensor: torch.Tensor) -> str:
+    """张量转base64 PNG（用于vision输入）"""
+    if tensor.dim() == 4:
+        tensor = tensor[0]
+    tensor = (tensor.clamp(0, 1) * 255).byte().cpu()
+    buf = io.BytesIO()
+    Image.fromarray(tensor.numpy()).save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode()
+
+def svg_save_html(svg_code: str, output_dir: Path, prefix: str) -> str:
+    """保存SVG为HTML以预览动画"""
+    try:
+        import folder_paths
+        if not output_dir.exists():
+            output_dir.mkdir(parents=True, exist_ok=True)
+        
+        timestamp = int(time.time())
+        html_path = output_dir / f"{prefix}_{timestamp}.html"
+        is_anim = svg_has_animation(svg_code)
+        
+        html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SVG {'(Animated)' if is_anim else ''}</title>
+    <style>
+        body {{ margin: 0; padding: 20px; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: Arial; }}
+        .container {{ background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .info {{ color: #666; font-size: 12px; margin-bottom: 10px; }}
+        svg {{ border: 1px solid #ddd; max-width: 100%; }}
+        {'svg * {{ animation-play-state: running !important; }}' if is_anim else ''}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="info">{time.strftime('%Y-%m-%d %H:%M:%S')} | {len(svg_code)} chars | {'Animated' if is_anim else 'Static'}</div>
+        {svg_code}
+    </div>
+</body>
+</html>"""
+        
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(html)
+        return str(html_path.absolute())
+    except Exception as e:
+        print(f"[SVG HTML Save Error] {e}")
+        return ""
+
+class SVG_Generate_Save_mmx:
+    DESCRIPTION = (
+        "图参考，生成SVG"
+    )
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
+                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/chat/completions"}),
+                "prompt": ("STRING", {"multiline": True, "default": "生成一个极简科技动画，蓝色渐变"}),
+                "model": ("STRING", {"default": "gemini-3-flash-preview"}),
+                "filename_prefix": ("STRING", {"default": "svg_output"}),
+                "width": ("INT", {"default": 512, "min": 64, "max": 2048, "step": 64}),
+                "height": ("INT", {"default": 512, "min": 64, "max": 2048, "step": 64}),
+            },
+            "optional": {
+                "temperature": ("FLOAT", {"default": 0.4, "min": 0.0, "max": 2.0, "step": 0.1}),
+                "max_tokens": ("INT", {"default": 4096, "min": 1024, "max": 8192, "step": 1024}),
+                "save_html": ("BOOLEAN", {"default": True, "tooltip": "含动画时保存HTML"}),
+                **{f"image_{i}": ("IMAGE",) for i in range(1, 15)}
+            }
+        }
+
+    RETURN_TYPES = ("STRING", "IMAGE", "STRING", "INT", "INT", "STRING", "STRING")
+    RETURN_NAMES = ("filepath", "preview_image", "html_path", "width", "height", "svg_code", "info")
+    FUNCTION = "generate_and_save"
+    CATEGORY = "哎呀✦MMX/图像"
+    OUTPUT_NODE = True
+
+    def build_messages(self, prompt: str, images: list, width: int, height: int):
+        """构建OpenAI格式消息"""
+        system_prompt = f"""You are an expert SVG designer.
+Generate standard SVG code based on user description.
+Viewport: viewBox="0 0 {width} {height}"
+Requirements:
+1. Valid SVG with xmlns="http://www.w3.org/2000/svg"
+2. Use vector elements (path, circle, rect), no base64 images
+3. Professional colors, hex values
+4. Return ONLY SVG code, no markdown, no explanations
+5. Support gradients and animations if requested"""
+
+        messages = [{"role": "system", "content": system_prompt}]
+        content = []
+        
+        # 添加参考图（vision格式）
+        for img_tensor in images:
+            if img_tensor is not None:
+                b64 = tensor_to_base64(img_tensor)
+                content.append({
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/png;base64,{b64}"}
+                })
+        
+        content.append({
+            "type": "text", 
+            "text": f"Generate SVG: {prompt}\n\nSVG Code:"
+        })
+        
+        messages.append({"role": "user", "content": content})
+        return messages
+
+    def generate_and_save(self, api_key, api_url, prompt, model, filename_prefix, 
+                         width, height, temperature=0.4, max_tokens=4096, 
+                         save_html=True, **image_inputs):
+        
+        if not api_key.strip():
+            empty = torch.zeros(1, height, width, 3)
+            return ("", empty, "", width, height, "", "Error: API Key missing")
+
+        # 收集图像
+        images = [image_inputs.get(f"image_{i}") for i in range(1, 15)]
+        valid_images = [img for img in images if img is not None]
+        
+        try:
+            print(f"[SVG] 开始生成 | 模型: {model} | 尺寸: {width}x{height} | 参考图: {len(valid_images)}张")
+            
+            # 1. 调用API生成
+            messages = self.build_messages(prompt, valid_images, width, height)
+            payload = {
+                "model": model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "top_p": 0.95,
+            }
+            headers = {
+                "Authorization": f"Bearer {api_key.strip()}",
+                "Content-Type": "application/json"
+            }
+            
+            resp = requests.post(api_url.strip(), headers=headers, json=payload, timeout=300)
+            resp.raise_for_status()
+            data = resp.json()
+            raw_content = data["choices"][0]["message"]["content"]
+            
+            # 2. 提取SVG
+            svg_code = svg_extract_from_text(raw_content)
+            if not svg_code:
+                print(f"[SVG] 提取SVG失败: {raw_content[:300]}")
+                return ("", torch.zeros(1, height, width, 3), "", width, height, "", "Error: No valid SVG")
+            
+            # 3. 生成彩色预览图（PyMuPDF优先）
+            preview = svg_to_tensor(svg_code, width, height)
+            
+            # 4. 保存SVG文件
+            import folder_paths
+            output_dir = Path(folder_paths.get_output_directory())
+            svg_dir = output_dir / "svg"
+            svg_dir.mkdir(parents=True, exist_ok=True)
+            
+            timestamp = int(time.time())
+            filename = f"{filename_prefix}_{timestamp}.svg"
+            filepath = svg_dir / filename
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(svg_code.strip())
+            
+            abs_path = str(filepath.absolute())
+            
+            # 5. 保存HTML（如果含动画）
+            html_path = ""
+            if save_html and svg_has_animation(svg_code):
+                html_dir = output_dir / "svg_html"
+                html_path = svg_save_html(svg_code, html_dir, filename_prefix)
+            
+            is_anim = svg_has_animation(svg_code)
+            info = f"✅ 成功 | 模型: {model} | 代码: {len(svg_code)}字符 | 动画: {'是' if is_anim else '否'}"
+            print(f"[SVG] 完成 | 已保存: {filename} ({len(svg_code)}字符)")
+            
+            return (abs_path, preview, html_path, width, height, svg_code, info)
+            
+        except Exception as e:
+            print(f"[SVG] 生成失败: {e}")
+            return ("", torch.zeros(1, height, width, 3), "", width, height, "", f"Error: {e}")
+
+
+# ===================================================================
 #  统一注册
 # ===================================================================
 register_node(GPTImageGenerate, "GPTImage_Generate_mmx")
 register_node(GPTImageEdit, "GPTImage_Edit_mmx")
 register_node(GPTImageEditSubmit, "GPTImage_Edit_Submit_mmx")
 register_node(GPTImageEditCollect, "GPTImage_Edit_Collect_mmx")
+register_node(SVG_Generate_Save_mmx, "SVG_Generate_mmx")
