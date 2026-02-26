@@ -740,6 +740,308 @@ class Veo3_1_Collector:
         return tuple(results + [info_str])
     
 # ===================================================================
+#  4. Gemini 原生格式图像生成 - 并发版本
+# ===================================================================
+class GeminiImageGenSubmit:
+    DESCRIPTION = (
+        "💕 哎呀✦Gemini 图像提交 | 原生格式并发\n"
+        "支持1-4K、14图输入，智能重试(503自动重试3次)，立即返回task_id"
+    )
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "endpoint_url": ("STRING", {
+                    "default": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+                    "placeholder": "https://xxx/v1beta/models/xxx:generateContent"
+                }),
+                "api_key": ("STRING", {"default": "", "placeholder": "AIzaSy... 或 sk-***"}),
+                "model": ("STRING", {"default": "gemini-3-pro-image-preview", "placeholder": "模型名称"}),
+                "prompt": ("STRING", {"forceInput": True, "multiline": True}),
+                "aspect_ratio": (["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"], {"default": "1:1"}),
+                "resolution": (["1K", "2K", "4K"], {"default": "4K"}),
+            },
+            "optional": {
+                **{f"input_image_{i}": ("IMAGE",) for i in range(1, 15)},
+                "max_retries": ("INT", {"default": 3, "min": 0, "max": 10, "step": 1, "display": "number"}),
+                "initial_delay": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.5, "display": "number"}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("task_id", "status")
+    FUNCTION = "submit"
+    CATEGORY = "哎呀✦MMX/图像"
+
+    # 类级别的连接池，复用TCP连接
+    _session = None
+
+    def __init__(self):
+        if GeminiImageGenSubmit._session is None:
+            GeminiImageGenSubmit._session = requests.Session()
+            adapter = requests.adapters.HTTPAdapter(
+                pool_connections=10,
+                pool_maxsize=10,
+                max_retries=0  # 我们用自定义重试逻辑
+            )
+            GeminiImageGenSubmit._session.mount('http://', adapter)
+            GeminiImageGenSubmit._session.mount('https://', adapter)
+
+    def tensor_to_base64(self, t: torch.Tensor) -> str:
+        """主线程执行：张量转base64，确保线程安全"""
+        if t.dim() == 4:
+            t = t.squeeze(0)
+        t = (t.clamp(0, 1) * 255).byte().cpu()
+        pil = Image.fromarray(t.numpy())
+        buf = io.BytesIO()
+        pil.save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode()
+
+    def add_random(self, p: str) -> str:
+        return f"{p} [var-{random.randint(10000, 99999)}]"
+
+    def build_gemini_payload(self, prompt: str, b64_images: list, ar: str, res: str, model: str):
+        """构造Gemini原生格式请求体"""
+        parts = [{"text": self.add_random(prompt)}]
+        for b64 in b64_images:
+            parts.append({
+                "inlineData": {
+                    "mimeType": "image/png",
+                    "data": b64
+                }
+            })
+        
+        payload = {
+            "contents": [{"parts": parts}],
+            "generationConfig": {
+                "responseModalities": ["IMAGE"],
+                "imageConfig": {
+                    "aspectRatio": ar,
+                    "imageSize": res.upper()
+                }
+            }
+        }
+        return payload
+
+    def make_request_with_retry(self, url: str, headers: dict, payload: dict, max_retries: int, initial_delay: float):
+        """带指数退避的请求，专门处理503/502"""
+        session = self._session or requests
+        
+        for attempt in range(max_retries + 1):
+            try:
+                resp = session.post(url, headers=headers, json=payload, timeout=300)
+                
+                # 成功
+                if resp.status_code == 200:
+                    return resp
+                
+                # 服务器过载，需要重试
+                if resp.status_code in (502, 503, 504):
+                    if attempt < max_retries:
+                        # 指数退避 + 随机抖动(0-1秒)
+                        delay = initial_delay * (2 ** attempt) + random.random()
+                        print(f"[GeminiSubmit] 503/502 第{attempt+1}/{max_retries}次重试，等待{delay:.1f}s...")
+                        time.sleep(delay)
+                        continue
+                    else:
+                        resp.raise_for_status()
+                
+                # 其他错误直接抛出
+                resp.raise_for_status()
+                
+            except requests.exceptions.Timeout:
+                if attempt < max_retries:
+                    delay = initial_delay * (2 ** attempt)
+                    print(f"[GeminiSubmit] 超时，第{attempt+1}次重试，等待{delay:.1f}s...")
+                    time.sleep(delay)
+                    continue
+                raise
+            except requests.exceptions.ConnectionError:
+                if attempt < max_retries:
+                    delay = initial_delay * (2 ** attempt)
+                    print(f"[GeminiSubmit] 连接错误，第{attempt+1}次重试，等待{delay:.1f}s...")
+                    time.sleep(delay)
+                    continue
+                raise
+        
+        return resp
+
+    def submit(self, endpoint_url, api_key, model, prompt, aspect_ratio, resolution, 
+               max_retries=3, initial_delay=1.0, **img_ports):
+        # 1. 主线程：收集并转换所有图像（避免跨线程操作张量）
+        b64_images = []
+        for i in range(1, 15):
+            img = img_ports.get(f"input_image_{i}")
+            if img is not None:
+                try:
+                    b64_images.append(self.tensor_to_base64(img))
+                except Exception as e:
+                    print(f"[GeminiSubmit] 转换图{i}失败: {e}")
+        
+        cnt = len(b64_images)
+        
+        if not api_key.strip():
+            return ("", "Error: API Key missing")
+        
+        # 2. 生成task_id并注册事件
+        task_id = str(uuid.uuid4())
+        event = threading.Event()
+        with _cache_lock:
+            _processing_events[task_id] = event
+        
+        # 3. 复制参数到闭包
+        _endpoint = endpoint_url.strip()
+        _api_key = api_key.strip()
+        _model = model
+        _prompt = prompt
+        _ar = aspect_ratio
+        _res = resolution
+        _cnt = cnt
+        _max_retries = max_retries
+        _initial_delay = initial_delay
+        
+        # 4. 后台任务闭包（只访问base64字符串，不接触张量）
+        def worker():
+            try:
+                print(f"[GeminiSubmit] 后台启动 | task: {task_id[:8]} | 模型: {_model} | 图: {_cnt}张")
+                
+                payload = self.build_gemini_payload(_prompt, b64_images, _ar, _res, _model)
+                
+                # 支持两种鉴权方式：Header(Bearer) 或 URL参数(key=)
+                headers = {"Content-Type": "application/json"}
+                url = _endpoint
+                
+                # 如果api_key是sk开头，使用Bearer；否则假设是Google API Key，加到URL
+                if _api_key.startswith("sk-"):
+                    headers["Authorization"] = f"Bearer {_api_key}"
+                else:
+                    separator = "&" if "?" in url else "?"
+                    url = f"{url}{separator}key={_api_key}"
+                
+                # 使用重试机制发送请求
+                resp = self.make_request_with_retry(
+                    url, headers, payload, 
+                    max_retries=_max_retries, 
+                    initial_delay=_initial_delay
+                )
+                
+                data = resp.json()
+                
+                # 解析Gemini原生格式响应
+                image_tensor = None
+                for cand in data.get("candidates", []):
+                    for part in cand.get("content", {}).get("parts", []):
+                        if "inlineData" in part:
+                            b64_data = part["inlineData"]["data"]
+                            im = Image.open(io.BytesIO(base64.b64decode(b64_data))).convert("RGB")
+                            image_tensor = pil2tensor(im)
+                            break
+                    if image_tensor is not None:
+                        break
+                
+                if image_tensor is not None:
+                    cache_result(task_id, image_tensor)
+                    print(f"[GeminiSubmit] 后台完成 | task: {task_id[:8]} | 成功({image_tensor.shape})")
+                else:
+                    print(f"[GeminiSubmit] 后台完成 | task: {task_id[:8]} | 未返回图片")
+                    cache_result(task_id, None)
+                    
+            except Exception as e:
+                print(f"[GeminiSubmit] 后台异常 | task: {task_id[:8]} | {e}")
+                cache_result(task_id, None)
+        
+        # 5. 启动线程并立即返回
+        threading.Thread(target=worker, daemon=True).start()
+        print(f"[GeminiSubmit] 已提交 | task_id: {task_id[:8]}... | 图片: {cnt}张 | 分辨率: {resolution} | 最大重试: {max_retries}")
+        return (task_id, "Submitted")
+
+
+class GeminiImageGenCollector:
+    DESCRIPTION = (
+        "💕 哎呀✦Gemini 图像收集器 | 九路并发\n"
+        "收集最多9个Gemini图像提交节点的结果，按顺序一一对应\n"
+        "未连接/超时/失败的输出64x64空白图"
+    )
+    
+    RETURN_TYPES = ("IMAGE", "IMAGE", "IMAGE", "IMAGE", "IMAGE", 
+                   "IMAGE", "IMAGE", "IMAGE", "IMAGE", "STRING")
+    RETURN_NAMES = ("image_1", "image_2", "image_3", "image_4", "image_5",
+                   "image_6", "image_7", "image_8", "image_9", "info")
+    FUNCTION = "collect"
+    CATEGORY = "哎呀✦MMX/图像"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {},
+            "optional": {
+                f"task_id_{i}": ("STRING", {"forceInput": True}) for i in range(1, 10)
+            }
+        }
+
+    def create_empty_image(self):
+        """构造空白图像张量 (1, 64, 64, 3)"""
+        return torch.zeros(1, 64, 64, 3)
+
+    def wait_for_image(self, task_id: str, max_wait: float = 300.0):
+        """轮询等待图像结果"""
+        start = time.time()
+        check_interval = 0.5
+        
+        while time.time() - start < max_wait:
+            result = get_result(task_id)
+            if result is not None:
+                return result
+            # 检查是否还在处理中（事件存在且未设置）
+            with _cache_lock:
+                event = _processing_events.get(task_id)
+            if event is None:
+                # 任务从未注册或已被清理
+                return None
+            if event.is_set() and get_result(task_id) is None:
+                # 事件已设置但结果为空（失败）
+                return None
+            time.sleep(check_interval)
+        
+        return None
+
+    def collect(self, **kwargs):
+        task_ids = [kwargs.get(f"task_id_{i}", "") for i in range(1, 10)]
+        results = []
+        info_lines = []
+        info_lines.append(f"🖼️ Gemini Collector | {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        info_lines.append("-" * 40)
+        
+        success_count = 0
+        
+        for idx, task_id in enumerate(task_ids, 1):
+            if not task_id or not isinstance(task_id, str):
+                results.append(self.create_empty_image())
+                info_lines.append(f"[{idx}/9] ⚪ 未连接")
+                continue
+            
+            print(f"[GeminiCollector] 等待 [{idx}/9] | task: {task_id[:8]}...")
+            img_tensor = self.wait_for_image(task_id, max_wait=300)
+            
+            if img_tensor is None:
+                results.append(self.create_empty_image())
+                info_lines.append(f"[{idx}/9] ❌ 失败/超时 | {task_id[:8]}")
+            else:
+                # 确保格式正确 (B,H,W,C)
+                if img_tensor.dim() == 3:
+                    img_tensor = img_tensor.unsqueeze(0)
+                results.append(img_tensor)
+                h, w = img_tensor.shape[1], img_tensor.shape[2]
+                info_lines.append(f"[{idx}/9] ✅ 成功 | {w}x{h} | {task_id[:8]}")
+                success_count += 1
+        
+        info_str = "\n".join(info_lines)
+        print(f"[GeminiCollector] 收集完成 | 成功: {success_count}/9")
+        
+        return tuple(results + [info_str])
+
+# ===================================================================
 #  统一注册
 # ===================================================================
 register_node(NanoBananaPro, "NanoBanana_Pro_mmx")
@@ -748,3 +1050,5 @@ register_node(Gemini3Vision, "Gemini3Vision_mmx")
 register_node(Veo3_1, "Veo3.1_mmx")
 register_node(Veo3_1_Submit, "Veo3.1_Submit_mmx")
 register_node(Veo3_1_Collector, "Veo3.1_Collector_mmx")
+register_node(GeminiImageGenSubmit, "GeminiImageGen_Submit_mmx")
+register_node(GeminiImageGenCollector, "GeminiImageGen_Collector_mmx")
