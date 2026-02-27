@@ -534,34 +534,44 @@ class RedLineSplit_mmx:
     CATEGORY = "哎呀✦MMX/图像"
 
     def hex_to_hsv_range(self, hex_color, tolerance):
-        """十六进制颜色转HSV范围"""
+        """十六进制颜色转HSV范围，支持黑白灰特殊处理"""
         hex_color = hex_color.lstrip('#')
         if len(hex_color) != 6:
             raise ValueError(f"无效颜色格式: #{hex_color}，应为 #RRGGBB")
         
-        # 转RGB
         r = int(hex_color[0:2], 16)
         g = int(hex_color[2:4], 16)
         b = int(hex_color[4:6], 16)
         
-        # RGB转HSV
+        # 判断是否为灰度色（黑白灰）
+        max_val = max(r, g, b)
+        min_val = min(r, g, b)
+        is_gray = (max_val - min_val) < 30  # RGB差值小于30视为灰度
+        
+        if is_gray:
+            avg = (r + g + b) // 3
+            if avg < 60:  # 黑色（暗色）
+                return "black", avg
+            elif avg > 200:  # 白色（亮色）
+                return "white", avg
+            else:  # 灰色
+                return "gray", avg
+        
+        # 彩色逻辑（原有）
         rgb = np.uint8([[[r, g, b]]])
         hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
         h = int(hsv[0][0][0])
         
-        # 红色在0/180度附近需特殊处理（色相环绕）
         lower_sat, upper_sat = 80, 255
         lower_val, upper_val = 50, 255
         
         if (0 <= h <= tolerance) or (180 - tolerance <= h <= 180):
-            # 红色系：双范围检测
             lower1 = np.array([0, lower_sat, lower_val])
             upper1 = np.array([tolerance, upper_sat, upper_val])
             lower2 = np.array([180 - tolerance, lower_sat, lower_val])
             upper2 = np.array([180, upper_sat, upper_val])
             return [(lower1, upper1), (lower2, upper2)]
         else:
-            # 其他颜色：单范围
             h_min = max(0, h - tolerance)
             h_max = min(180, h + tolerance)
             lower = np.array([h_min, lower_sat, lower_val])
@@ -577,14 +587,40 @@ class RedLineSplit_mmx:
             
         h, w = img.shape[:2]
         
-        # 解析颜色范围
-        hsv_ranges = self.hex_to_hsv_range(line_color, color_range)
+        # 解析颜色
+        result = self.hex_to_hsv_range(line_color, color_range)
         
-        # 构建颜色掩码
-        mask = np.zeros((h, w), dtype=np.uint8)
-        for lower, upper in hsv_ranges:
-            mask = cv2.bitwise_or(mask, cv2.inRange(cv2.cvtColor(img, cv2.COLOR_RGB2HSV), lower, upper))
+        # 构建掩码
+        if result[0] == "black":
+            # 黑色：基于灰度图低阈值
+            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+            # 自动计算阈值：黑色为中位数减范围，或固定<50
+            threshold = min(result[1] + color_range, 80)  # 默认#000000(0)+15=15，但上限80避免太宽
+            _, mask = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)  # 低于阈值=黑线=白mask
+            
+        elif result[0] == "white":
+            # 白色：基于灰度图高阈值
+            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+            threshold = max(result[1] - color_range, 180)  # 默认#FFFFFF(255)-15=240，下限180避免太宽
+            _, mask = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)  # 高于阈值=白线=白mask
+            
+        elif result[0] == "gray":
+            # 灰色：基于灰度图中值范围
+            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+            target = result[1]
+            lower = max(0, target - color_range)
+            upper = min(255, target + color_range)
+            mask = cv2.inRange(gray, lower, upper)
+            
+        else:
+            # 彩色：原有HSV逻辑
+            hsv_ranges = result
+            hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+            mask = np.zeros((h, w), dtype=np.uint8)
+            for lower, upper in hsv_ranges:
+                mask = cv2.bitwise_or(mask, cv2.inRange(hsv, lower, upper))
         
+        # 后续逻辑不变...
         # 闭运算连接断裂线
         if close_gap > 0:
             kernel = np.ones((close_gap, close_gap), np.uint8)
@@ -607,14 +643,14 @@ class RedLineSplit_mmx:
         for i in range(1, num):
             x, y, bw, bh, area = stats[i]
             
-            # 【关键】尺寸过滤：宽高都需大于min_size
+            # 尺寸过滤
             piece_w = bw - edge_clean * 2
             piece_h = bh - edge_clean * 2
             
             if piece_w < min_size or piece_h < min_size:
-                continue  # 跳过小窗户/噪点
+                continue
             
-            # 切边收缩去除分割线残留
+            # 切边收缩
             x1 = min(x + edge_clean, x + bw // 2)
             y1 = min(y + edge_clean, y + bh // 2)
             x2 = max(x + bw - edge_clean, x + bw // 2)
@@ -634,11 +670,9 @@ class RedLineSplit_mmx:
         if count == 0:
             pieces = [{'img': img, 'cy': h/2, 'cx': w/2}]
             count = 1
-            info = "未检测到有效区域，返回原图"
+            info = f"未检测到{line_color}色分割线，返回原图"
         else:
-            # 按阅读顺序排序
             pieces.sort(key=lambda p: (p['cy'], p['cx']))
-            # 限制最多9张
             if count > 9:
                 pieces = pieces[:9]
                 count = 9
