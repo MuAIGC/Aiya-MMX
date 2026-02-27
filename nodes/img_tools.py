@@ -7,7 +7,7 @@ import uuid
 import time
 from pathlib import Path
 from typing import List, Optional
-
+import cv2
 import numpy as np
 import torch
 from PIL import Image
@@ -478,6 +478,186 @@ class ImageFolderLoader_mmx:
         return (single_image, batch, current_filename, current_idx, total)
 
 # --------------------------------------------------
+# 6. 红线闭合区域切割 RedLineSplit_mmx
+# --------------------------------------------------
+class RedLineSplit_mmx:
+    """
+    💕 哎呀✦MMX —— 闭合区域切割（支持任意颜色分割线）
+    
+    【功能说明】
+    • 识别指定颜色的分割线，提取围成的闭合区域
+    • 支持自定义颜色（默认红色 #FF0000）
+    • 最小尺寸过滤（防误识别小色块/窗户）
+    • 图像四边自动视为分割线边界
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+                "line_color": ("STRING", {
+                    "default": "#FF0000",
+                    "tooltip": "分割线颜色（十六进制，如 #FF0000红色 #00FF00绿色 #0000FF蓝色）"
+                }),
+                "color_range": ("INT", {
+                    "default": 15, 
+                    "min": 5, 
+                    "max": 60,
+                    "tooltip": "颜色识别范围（色相容忍度±），越大识别越宽泛"
+                }),
+                "close_gap": ("INT", {
+                    "default": 15, 
+                    "min": 0, 
+                    "max": 50,
+                    "tooltip": "闭合间隙：分割线断口小于此像素视为连通"
+                }),
+                "min_size": ("INT", {
+                    "default": 200, 
+                    "min": 32, 
+                    "max": 1024,
+                    "step": 16,
+                    "tooltip": "最小拼图块尺寸：宽或高小于此值视为噪点/误识别（如红色窗户），不予输出"
+                }),
+                "edge_clean": ("INT", {
+                    "default": 3, 
+                    "min": 0, 
+                    "max": 20,
+                    "tooltip": "切边收缩像素数，确保去除分割线残留"
+                }),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",) * 9 + ("INT", "STRING")
+    RETURN_NAMES = ("图1", "图2", "图3", "图4", "图5", "图6", "图7", "图8", "图9", "实际数量", "信息")
+    FUNCTION = "split"
+    CATEGORY = "哎呀✦MMX/图像"
+
+    def hex_to_hsv_range(self, hex_color, tolerance):
+        """十六进制颜色转HSV范围"""
+        hex_color = hex_color.lstrip('#')
+        if len(hex_color) != 6:
+            raise ValueError(f"无效颜色格式: #{hex_color}，应为 #RRGGBB")
+        
+        # 转RGB
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        
+        # RGB转HSV
+        rgb = np.uint8([[[r, g, b]]])
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
+        h = int(hsv[0][0][0])
+        
+        # 红色在0/180度附近需特殊处理（色相环绕）
+        lower_sat, upper_sat = 80, 255
+        lower_val, upper_val = 50, 255
+        
+        if (0 <= h <= tolerance) or (180 - tolerance <= h <= 180):
+            # 红色系：双范围检测
+            lower1 = np.array([0, lower_sat, lower_val])
+            upper1 = np.array([tolerance, upper_sat, upper_val])
+            lower2 = np.array([180 - tolerance, lower_sat, lower_val])
+            upper2 = np.array([180, upper_sat, upper_val])
+            return [(lower1, upper1), (lower2, upper2)]
+        else:
+            # 其他颜色：单范围
+            h_min = max(0, h - tolerance)
+            h_max = min(180, h + tolerance)
+            lower = np.array([h_min, lower_sat, lower_val])
+            upper = np.array([h_max, upper_sat, upper_val])
+            return [(lower, upper)]
+
+    def split(self, image, line_color, color_range, close_gap, min_size, edge_clean):
+        # 转换输入 [B,H,W,C] -> [H,W,C]
+        if len(image.shape) == 4:
+            img = (image[0].cpu().numpy() * 255).astype(np.uint8)
+        else:
+            img = (image.cpu().numpy() * 255).astype(np.uint8)
+            
+        h, w = img.shape[:2]
+        
+        # 解析颜色范围
+        hsv_ranges = self.hex_to_hsv_range(line_color, color_range)
+        
+        # 构建颜色掩码
+        mask = np.zeros((h, w), dtype=np.uint8)
+        for lower, upper in hsv_ranges:
+            mask = cv2.bitwise_or(mask, cv2.inRange(cv2.cvtColor(img, cv2.COLOR_RGB2HSV), lower, upper))
+        
+        # 闭运算连接断裂线
+        if close_gap > 0:
+            kernel = np.ones((close_gap, close_gap), np.uint8)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        
+        # 四边视为分割线边界
+        mask[0, :] = 255
+        mask[-1, :] = 255
+        mask[:, 0] = 255
+        mask[:, -1] = 255
+        
+        # 反转：分割线变墙(0)，背景变房间(255)
+        inv = cv2.bitwise_not(mask)
+        
+        # 连通域分析
+        num, labels, stats, cents = cv2.connectedComponentsWithStats(inv, connectivity=4)
+        
+        # 提取闭合区域
+        pieces = []
+        for i in range(1, num):
+            x, y, bw, bh, area = stats[i]
+            
+            # 【关键】尺寸过滤：宽高都需大于min_size
+            piece_w = bw - edge_clean * 2
+            piece_h = bh - edge_clean * 2
+            
+            if piece_w < min_size or piece_h < min_size:
+                continue  # 跳过小窗户/噪点
+            
+            # 切边收缩去除分割线残留
+            x1 = min(x + edge_clean, x + bw // 2)
+            y1 = min(y + edge_clean, y + bh // 2)
+            x2 = max(x + bw - edge_clean, x + bw // 2)
+            y2 = max(y + bh - edge_clean, y + bh // 2)
+            
+            if x2 > x1 and y2 > y1:
+                piece = img[y1:y2, x1:x2]
+                pieces.append({
+                    'img': piece,
+                    'cy': cents[i][1],
+                    'cx': cents[i][0],
+                })
+        
+        count = len(pieces)
+        
+        # 未检测到有效区域时返回原图
+        if count == 0:
+            pieces = [{'img': img, 'cy': h/2, 'cx': w/2}]
+            count = 1
+            info = "未检测到有效区域，返回原图"
+        else:
+            # 按阅读顺序排序
+            pieces.sort(key=lambda p: (p['cy'], p['cx']))
+            # 限制最多9张
+            if count > 9:
+                pieces = pieces[:9]
+                count = 9
+                info = f"检测到{len(pieces)}个区域，输出前9张"
+            else:
+                info = f"检测到{count}个闭合区域（≥{min_size}px）"
+        
+        # 打包9个输出
+        outs = []
+        for i in range(9):
+            if i < count:
+                tensor = torch.from_numpy(pieces[i]['img'].astype(np.float32) / 255.0).unsqueeze(0)
+            else:
+                tensor = torch.zeros((1, 64, 64, 3), dtype=torch.float32)
+            outs.append(tensor)
+            
+        return (*outs, count, info)
+
+# --------------------------------------------------
 #  统一注册
 # --------------------------------------------------
 register_node(ImageBatchCollector_mmx, "ImageBatchCollector_mmx")
@@ -485,3 +665,4 @@ register_node(save2JPG_mmx, "save2JPG_mmx")
 register_node(LoadImageFromPath_mmx, "LoadImageFromPath_mmx")
 register_node(ImageSplitGrid_mmx, "ImageSplitGrid_mmx")
 register_node(ImageFolderLoader_mmx, "ImageFolderLoader_mmx")
+register_node(RedLineSplit_mmx, "RedLineSplit_mmx")
