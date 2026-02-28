@@ -745,7 +745,6 @@ class Veo3_1_Collector:
 class GeminiImageGenSubmit:
     DESCRIPTION = (
         "💕 哎呀✦Gemini 图像提交 | 原生格式并发\n"
-        "支持1-4K、14图输入，智能重试(503自动重试3次)，立即返回task_id"
     )
 
     @classmethod
@@ -757,7 +756,7 @@ class GeminiImageGenSubmit:
                     "placeholder": "https://xxx/v1beta/models/xxx:generateContent"
                 }),
                 "api_key": ("STRING", {"default": "", "placeholder": "AIzaSy... 或 sk-***"}),
-                "model": ("STRING", {"default": "gemini-3-pro-image-preview", "placeholder": "模型名称"}),
+                "model": ("STRING", {"default": "gemini-2.0-flash-exp-image-generation", "placeholder": "模型名称"}),
                 "prompt": ("STRING", {"forceInput": True, "multiline": True}),
                 "aspect_ratio": (["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"], {"default": "1:1"}),
                 "resolution": (["1K", "2K", "4K"], {"default": "4K"}),
@@ -960,7 +959,7 @@ class GeminiImageGenSubmit:
 class GeminiImageGenCollector:
     DESCRIPTION = (
         "💕 哎呀✦Gemini 图像收集器 | 九路并发\n"
-        "收集最多9个Gemini图像提交节点的结果，按顺序一一对应\n"
+        "收集最多9个Gemini图像提交节点的结果，超时时间可调\n"
         "未连接/超时/失败的输出64x64空白图"
     )
     
@@ -974,9 +973,18 @@ class GeminiImageGenCollector:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {},
+            "required": {
+                "max_wait_seconds": ("FLOAT", {
+                    "default": 300.0, 
+                    "min": 10.0, 
+                    "max": 600.0, 
+                    "step": 10.0,
+                    "display": "number",
+                    "tooltip": "每个任务的最大等待时间（秒），超过则视为失败"
+                }),
+            },
             "optional": {
-                f"task_id_{i}": ("STRING", {"forceInput": True}) for i in range(1, 10)
+                **{f"task_id_{i}": ("STRING", {"forceInput": True}) for i in range(1, 10)}
             }
         }
 
@@ -984,10 +992,9 @@ class GeminiImageGenCollector:
         """构造空白图像张量 (1, 64, 64, 3)"""
         return torch.zeros(1, 64, 64, 3)
 
-    def wait_for_image(self, task_id: str, max_wait: float = 300.0):
+    def wait_for_image(self, task_id: str, max_wait: float, check_interval: float = 0.5):
         """轮询等待图像结果"""
         start = time.time()
-        check_interval = 0.5
         
         while time.time() - start < max_wait:
             result = get_result(task_id)
@@ -1006,11 +1013,12 @@ class GeminiImageGenCollector:
         
         return None
 
-    def collect(self, **kwargs):
+    def collect(self, max_wait_seconds, **kwargs):
         task_ids = [kwargs.get(f"task_id_{i}", "") for i in range(1, 10)]
         results = []
         info_lines = []
         info_lines.append(f"🖼️ Gemini Collector | {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        info_lines.append(f"⏱️ 超时设置: {max_wait_seconds:.0f}秒")
         info_lines.append("-" * 40)
         
         success_count = 0
@@ -1021,8 +1029,8 @@ class GeminiImageGenCollector:
                 info_lines.append(f"[{idx}/9] ⚪ 未连接")
                 continue
             
-            print(f"[GeminiCollector] 等待 [{idx}/9] | task: {task_id[:8]}...")
-            img_tensor = self.wait_for_image(task_id, max_wait=300)
+            print(f"[GeminiCollector] 等待 [{idx}/9] | task: {task_id[:8]}... | 限时: {max_wait_seconds:.0f}s")
+            img_tensor = self.wait_for_image(task_id, max_wait=max_wait_seconds)
             
             if img_tensor is None:
                 results.append(self.create_empty_image())
@@ -1037,10 +1045,10 @@ class GeminiImageGenCollector:
                 success_count += 1
         
         info_str = "\n".join(info_lines)
-        print(f"[GeminiCollector] 收集完成 | 成功: {success_count}/9")
+        print(f"[GeminiCollector] 收集完成 | 成功: {success_count}/9 | 超时阈值: {max_wait_seconds:.0f}s")
         
         return tuple(results + [info_str])
-
+    
 # ===================================================================
 #  统一注册
 # ===================================================================
