@@ -758,7 +758,7 @@ class GeminiImageGenSubmit:
                 "api_key": ("STRING", {"default": "", "placeholder": "AIzaSy... 或 sk-***"}),
                 "model": ("STRING", {"default": "gemini-2.0-flash-exp-image-generation", "placeholder": "模型名称"}),
                 "prompt": ("STRING", {"forceInput": True, "multiline": True}),
-                "aspect_ratio": (["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"], {"default": "1:1"}),
+                "aspect_ratio": (["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"], {"default": "1:1"}),
                 "resolution": (["1K", "2K", "4K"], {"default": "4K"}),
             },
             "optional": {
