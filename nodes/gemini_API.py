@@ -745,6 +745,7 @@ class Veo3_1_Collector:
 class GeminiImageGenSubmit:
     DESCRIPTION = (
         "💕 哎呀✦Gemini 图像提交 | 原生格式并发\n"
+        "支持最多14张参考图，HTTP失败自动重试"
     )
 
     @classmethod
@@ -752,7 +753,7 @@ class GeminiImageGenSubmit:
         return {
             "required": {
                 "endpoint_url": ("STRING", {
-                    "default": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+                    "default": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent",
                     "placeholder": "https://xxx/v1beta/models/xxx:generateContent"
                 }),
                 "api_key": ("STRING", {"default": "", "placeholder": "AIzaSy... 或 sk-***"}),
@@ -760,11 +761,11 @@ class GeminiImageGenSubmit:
                 "prompt": ("STRING", {"forceInput": True, "multiline": True}),
                 "aspect_ratio": (["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"], {"default": "1:1"}),
                 "resolution": (["1K", "2K", "4K"], {"default": "4K"}),
+                "max_retries": ("INT", {"default": 1, "min": 0, "max": 10, "step": 1, "display": "number", "tooltip": "API请求失败(502/503/超时等)时的最大重试次数"}),
+                "retry_delay": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.5, "display": "number", "tooltip": "首次重试等待秒数(后续指数退避)"}),
             },
             "optional": {
                 **{f"input_image_{i}": ("IMAGE",) for i in range(1, 15)},
-                "max_retries": ("INT", {"default": 3, "min": 0, "max": 10, "step": 1, "display": "number"}),
-                "initial_delay": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 10.0, "step": 0.5, "display": "number"}),
             }
         }
 
@@ -773,7 +774,6 @@ class GeminiImageGenSubmit:
     FUNCTION = "submit"
     CATEGORY = "哎呀✦MMX/图像"
 
-    # 类级别的连接池，复用TCP连接
     _session = None
 
     def __init__(self):
@@ -782,13 +782,12 @@ class GeminiImageGenSubmit:
             adapter = requests.adapters.HTTPAdapter(
                 pool_connections=10,
                 pool_maxsize=10,
-                max_retries=0  # 我们用自定义重试逻辑
+                max_retries=0
             )
             GeminiImageGenSubmit._session.mount('http://', adapter)
             GeminiImageGenSubmit._session.mount('https://', adapter)
 
     def tensor_to_base64(self, t: torch.Tensor) -> str:
-        """主线程执行：张量转base64，确保线程安全"""
         if t.dim() == 4:
             t = t.squeeze(0)
         t = (t.clamp(0, 1) * 255).byte().cpu()
@@ -801,7 +800,6 @@ class GeminiImageGenSubmit:
         return f"{p} [var-{random.randint(10000, 99999)}]"
 
     def build_gemini_payload(self, prompt: str, b64_images: list, ar: str, res: str, model: str):
-        """构造Gemini原生格式请求体"""
         parts = [{"text": self.add_random(prompt)}]
         for b64 in b64_images:
             parts.append({
@@ -823,43 +821,40 @@ class GeminiImageGenSubmit:
         }
         return payload
 
-    def make_request_with_retry(self, url: str, headers: dict, payload: dict, max_retries: int, initial_delay: float):
-        """带指数退避的请求，专门处理503/502"""
+    def make_request_with_retry(self, url: str, headers: dict, payload: dict, max_retries: int, retry_delay: float):
+        """带指数退避的请求，外显重试次数"""
         session = self._session or requests
         
         for attempt in range(max_retries + 1):
             try:
                 resp = session.post(url, headers=headers, json=payload, timeout=300)
                 
-                # 成功
                 if resp.status_code == 200:
                     return resp
                 
                 # 服务器过载，需要重试
                 if resp.status_code in (502, 503, 504):
                     if attempt < max_retries:
-                        # 指数退避 + 随机抖动(0-1秒)
-                        delay = initial_delay * (2 ** attempt) + random.random()
-                        print(f"[GeminiSubmit] 503/502 第{attempt+1}/{max_retries}次重试，等待{delay:.1f}s...")
+                        delay = retry_delay * (2 ** attempt) + random.random()
+                        print(f"[GeminiSubmit] {resp.status_code} 第{attempt+1}/{max_retries}次重试，等待{delay:.1f}s...")
                         time.sleep(delay)
                         continue
                     else:
                         resp.raise_for_status()
                 
-                # 其他错误直接抛出
                 resp.raise_for_status()
                 
             except requests.exceptions.Timeout:
                 if attempt < max_retries:
-                    delay = initial_delay * (2 ** attempt)
-                    print(f"[GeminiSubmit] 超时，第{attempt+1}次重试，等待{delay:.1f}s...")
+                    delay = retry_delay * (2 ** attempt)
+                    print(f"[GeminiSubmit] 超时，第{attempt+1}/{max_retries}次重试，等待{delay:.1f}s...")
                     time.sleep(delay)
                     continue
                 raise
             except requests.exceptions.ConnectionError:
                 if attempt < max_retries:
-                    delay = initial_delay * (2 ** attempt)
-                    print(f"[GeminiSubmit] 连接错误，第{attempt+1}次重试，等待{delay:.1f}s...")
+                    delay = retry_delay * (2 ** attempt)
+                    print(f"[GeminiSubmit] 连接错误，第{attempt+1}/{max_retries}次重试，等待{delay:.1f}s...")
                     time.sleep(delay)
                     continue
                 raise
@@ -867,8 +862,8 @@ class GeminiImageGenSubmit:
         return resp
 
     def submit(self, endpoint_url, api_key, model, prompt, aspect_ratio, resolution, 
-               max_retries=3, initial_delay=1.0, **img_ports):
-        # 1. 主线程：收集并转换所有图像（避免跨线程操作张量）
+               max_retries=3, retry_delay=1.0, **img_ports):
+        # 1. 主线程：收集并转换所有图像
         b64_images = []
         for i in range(1, 15):
             img = img_ports.get(f"input_image_{i}")
@@ -898,31 +893,28 @@ class GeminiImageGenSubmit:
         _res = resolution
         _cnt = cnt
         _max_retries = max_retries
-        _initial_delay = initial_delay
+        _retry_delay = retry_delay
         
-        # 4. 后台任务闭包（只访问base64字符串，不接触张量）
+        # 4. 后台任务闭包
         def worker():
             try:
-                print(f"[GeminiSubmit] 后台启动 | task: {task_id[:8]} | 模型: {_model} | 图: {_cnt}张")
+                print(f"[GeminiSubmit] 后台启动 | task: {task_id[:8]} | 模型: {_model} | 图: {_cnt}张 | 最大重试: {_max_retries}")
                 
                 payload = self.build_gemini_payload(_prompt, b64_images, _ar, _res, _model)
                 
-                # 支持两种鉴权方式：Header(Bearer) 或 URL参数(key=)
                 headers = {"Content-Type": "application/json"}
                 url = _endpoint
                 
-                # 如果api_key是sk开头，使用Bearer；否则假设是Google API Key，加到URL
                 if _api_key.startswith("sk-"):
                     headers["Authorization"] = f"Bearer {_api_key}"
                 else:
                     separator = "&" if "?" in url else "?"
                     url = f"{url}{separator}key={_api_key}"
                 
-                # 使用重试机制发送请求
                 resp = self.make_request_with_retry(
                     url, headers, payload, 
                     max_retries=_max_retries, 
-                    initial_delay=_initial_delay
+                    retry_delay=_retry_delay
                 )
                 
                 data = resp.json()
@@ -952,15 +944,14 @@ class GeminiImageGenSubmit:
         
         # 5. 启动线程并立即返回
         threading.Thread(target=worker, daemon=True).start()
-        print(f"[GeminiSubmit] 已提交 | task_id: {task_id[:8]}... | 图片: {cnt}张 | 分辨率: {resolution} | 最大重试: {max_retries}")
+        print(f"[GeminiSubmit] 已提交 | task_id: {task_id[:8]}... | 图片: {cnt}张 | 分辨率: {resolution} | HTTP重试: {max_retries}")
         return (task_id, "Submitted")
 
 
 class GeminiImageGenCollector:
     DESCRIPTION = (
         "💕 哎呀✦Gemini 图像收集器 | 九路并发\n"
-        "收集最多9个Gemini图像提交节点的结果，超时时间可调\n"
-        "未连接/超时/失败的输出64x64空白图"
+        "支持失败重试，超时时间可调，未连接/超时/失败的输出64x64空白图"
     )
     
     RETURN_TYPES = ("IMAGE", "IMAGE", "IMAGE", "IMAGE", "IMAGE", 
@@ -980,7 +971,23 @@ class GeminiImageGenCollector:
                     "max": 600.0, 
                     "step": 10.0,
                     "display": "number",
-                    "tooltip": "每个任务的最大等待时间（秒），超过则视为失败"
+                    "tooltip": "每路任务单次等待的最大时间（秒）"
+                }),
+                "max_retries": ("INT", {
+                    "default": 1, 
+                    "min": 0, 
+                    "max": 5, 
+                    "step": 1,
+                    "display": "number",
+                    "tooltip": "单路获取失败(超时/异常)后的最大重试次数"
+                }),
+                "retry_delay": ("FLOAT", {
+                    "default": 3.0, 
+                    "min": 0.0, 
+                    "max": 30.0, 
+                    "step": 1.0,
+                    "display": "number",
+                    "tooltip": "两次重试之间的间隔（秒）"
                 }),
             },
             "optional": {
@@ -1000,25 +1007,22 @@ class GeminiImageGenCollector:
             result = get_result(task_id)
             if result is not None:
                 return result
-            # 检查是否还在处理中（事件存在且未设置）
             with _cache_lock:
                 event = _processing_events.get(task_id)
             if event is None:
-                # 任务从未注册或已被清理
                 return None
             if event.is_set() and get_result(task_id) is None:
-                # 事件已设置但结果为空（失败）
                 return None
             time.sleep(check_interval)
         
         return None
 
-    def collect(self, max_wait_seconds, **kwargs):
+    def collect(self, max_wait_seconds, max_retries, retry_delay, **kwargs):
         task_ids = [kwargs.get(f"task_id_{i}", "") for i in range(1, 10)]
         results = []
         info_lines = []
         info_lines.append(f"🖼️ Gemini Collector | {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        info_lines.append(f"⏱️ 超时设置: {max_wait_seconds:.0f}秒")
+        info_lines.append(f"⏱️ 单次超时: {max_wait_seconds:.0f}s | 失败重试: {max_retries}次 | 重试间隔: {retry_delay:.0f}s")
         info_lines.append("-" * 40)
         
         success_count = 0
@@ -1029,23 +1033,37 @@ class GeminiImageGenCollector:
                 info_lines.append(f"[{idx}/9] ⚪ 未连接")
                 continue
             
-            print(f"[GeminiCollector] 等待 [{idx}/9] | task: {task_id[:8]}... | 限时: {max_wait_seconds:.0f}s")
-            img_tensor = self.wait_for_image(task_id, max_wait=max_wait_seconds)
+            img_tensor = None
+            last_error = ""
+            
+            # 重试循环
+            for attempt in range(max_retries + 1):
+                if attempt > 0:
+                    print(f"[GeminiCollector] 第{attempt}/{max_retries}次重试 [{idx}/9] | task: {task_id[:8]}...")
+                    time.sleep(retry_delay)
+                
+                print(f"[GeminiCollector] 等待 [{idx}/9] | task: {task_id[:8]}... | 限时: {max_wait_seconds:.0f}s (尝试{attempt+1}/{max_retries+1})")
+                img_tensor = self.wait_for_image(task_id, max_wait=max_wait_seconds)
+                
+                if img_tensor is not None:
+                    break
+                else:
+                    last_error = "超时或失败"
             
             if img_tensor is None:
                 results.append(self.create_empty_image())
-                info_lines.append(f"[{idx}/9] ❌ 失败/超时 | {task_id[:8]}")
+                info_lines.append(f"[{idx}/9] ❌ 失败 | {last_error} | {task_id[:8]}")
             else:
-                # 确保格式正确 (B,H,W,C)
                 if img_tensor.dim() == 3:
                     img_tensor = img_tensor.unsqueeze(0)
                 results.append(img_tensor)
                 h, w = img_tensor.shape[1], img_tensor.shape[2]
-                info_lines.append(f"[{idx}/9] ✅ 成功 | {w}x{h} | {task_id[:8]}")
+                retries_info = f"(重试{attempt}次)" if attempt > 0 else ""
+                info_lines.append(f"[{idx}/9] ✅ 成功 | {w}x{h} {retries_info} | {task_id[:8]}")
                 success_count += 1
         
         info_str = "\n".join(info_lines)
-        print(f"[GeminiCollector] 收集完成 | 成功: {success_count}/9 | 超时阈值: {max_wait_seconds:.0f}s")
+        print(f"[GeminiCollector] 收集完成 | 成功: {success_count}/9")
         
         return tuple(results + [info_str])
     
