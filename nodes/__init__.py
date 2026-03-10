@@ -1,6 +1,6 @@
 """
 💕 哎呀✦MMX 节点自动装载机
-按文件名升序批量导入，避免手动维护
+按文件名升序批量导入，避免手动维护（支持 .py 和 .so 加密文件）
 """
 from __future__ import annotations
 import glob
@@ -9,7 +9,7 @@ import shutil
 import sys
 
 # ═══════════════════════════════════════════════════════════════════
-# 批量导入（静默模式）
+# 批量导入（静默模式）- 同时支持 .py 源码和 .so 加密文件
 # ═══════════════════════════════════════════════════════════════════
 
 class _SilentWriter:
@@ -20,10 +20,20 @@ class _SilentWriter:
 loaded_modules = []
 _original_stdout = sys.stdout
 
-for f in sorted(glob.glob(os.path.join(os.path.dirname(__file__), "*.py"))):
-    name = os.path.basename(f)[:-3]
-    if name == "__init__":
+# 关键修改：同时搜索 .py 和 .so 文件
+_module_files = sorted(
+    glob.glob(os.path.join(os.path.dirname(__file__), "*.py")) +
+    glob.glob(os.path.join(os.path.dirname(__file__), "*.so"))
+)
+
+for f in _module_files:
+    # 关键修改：用 splitext 正确处理 .py 和 .so 扩展名
+    name = os.path.splitext(os.path.basename(f))[0]
+    
+    # 跳过 __init__ 和已处理的模块（防止 .py 和 .so 重复导入）
+    if name == "__init__" or name in loaded_modules:
         continue
+        
     try:
         # 导入期间抑制 stdout，拦截 "✅ 已注册节点" 等打印
         sys.stdout = _SilentWriter()
