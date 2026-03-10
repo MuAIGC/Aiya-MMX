@@ -5,122 +5,115 @@ import os
 import sys
 import shutil
 import compileall
-import py_compile
-
-SOURCE_NAME = "Aiya-MMX"
-TARGET_NAME = "Aiya-MMX-B"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.dirname(SCRIPT_DIR)
-SOURCE_DIR = os.path.join(PARENT_DIR, SOURCE_NAME)
-TARGET_DIR = os.path.join(PARENT_DIR, TARGET_NAME)
+SOURCE_DIR = os.path.join(PARENT_DIR, "Aiya-MMX")
+TARGET_DIR = os.path.join(PARENT_DIR, "Aiya-MMX-B")
 
-def log(msg):
-    print(f">>> {msg}")
+print(f"Python {sys.version_info.major}.{sys.version_info.minor}")
+print(f"源: {SOURCE_DIR}")
+print(f"目标: {TARGET_DIR}")
+print("-" * 40)
 
-def find_pyc(py_path):
-    """查找编译后的 pyc 文件"""
-    base = os.path.dirname(py_path)
-    name = os.path.basename(py_path)[:-3]  # 去掉 .py
+def process_init_file(src_path, dst_path):
+    """处理 __init__.py：把 *.py 改为 *.pyc"""
+    with open(src_path, 'r', encoding='utf-8') as f:
+        content = f.read()
     
-    # Python 3.13 可能的路径
-    candidates = [
-        os.path.join(base, "__pycache__", f"{name}.cpython-313.opt-2.pyc"),
-        os.path.join(base, "__pycache__", f"{name}.cpython-313.pyc"),
-        os.path.join(base, "__pycache__", f"{name}.opt-2.pyc"),
-        py_path + 'c',
-    ]
+    # 替换 glob 模式：*.py -> *.pyc
+    # 但要避免重复替换（如果已经是 *.pyc 就不再改）
+    original = content
+    content = content.replace('*.py"', '*.pyc"')
+    content = content.replace("*.py'", "*.pyc'")
+    content = content.replace('*.py)', '*.pyc)')
     
-    for c in candidates:
-        if os.path.exists(c):
-            return c
-    return None
+    if content != original:
+        print(f"    [自动修复] *.py -> *.pyc")
+    
+    with open(dst_path, 'w', encoding='utf-8') as f:
+        f.write(content)
 
-def build():
-    log(f"开始构建: {SOURCE_NAME} -> {TARGET_NAME}")
+# 清理
+if os.path.exists(TARGET_DIR):
+    shutil.rmtree(TARGET_DIR)
+os.makedirs(TARGET_DIR)
+
+compiled = 0
+
+for root, dirs, files in os.walk(SOURCE_DIR):
+    dirs[:] = [d for d in dirs if d not in ['__pycache__', '.git', 'dist', 'release', 'Aiya-MMX-B']]
     
-    if not os.path.exists(SOURCE_DIR):
-        log(f"错误: 找不到 {SOURCE_DIR}")
-        return False
+    rel = os.path.relpath(root, SOURCE_DIR)
+    dst_root = os.path.join(TARGET_DIR, rel) if rel != '.' else TARGET_DIR
+    os.makedirs(dst_root, exist_ok=True)
     
-    # 清理
-    if os.path.exists(TARGET_DIR):
-        shutil.rmtree(TARGET_DIR)
-    os.makedirs(TARGET_DIR, exist_ok=True)
-    
-    compiled = 0
-    copied = 0
-    
-    for root, dirs, files in os.walk(SOURCE_DIR):
-        dirs[:] = [d for d in dirs if d not in ['__pycache__', '.git', 'dist', 'release', TARGET_NAME]]
-        
-        rel = os.path.relpath(root, SOURCE_DIR)
-        if rel == '.':
-            rel = ''
-        
-        dst_root = os.path.join(TARGET_DIR, rel)
-        
-        for f in files:
-            if f.startswith('.') or f.endswith('.pyc'):
-                continue
+    for f in files:
+        if f.startswith('.') or f.endswith('.pyc'):
+            continue
             
-            src = os.path.join(root, f)
-            display = os.path.join(rel, f) if rel else f
-            is_root_init = (rel == '' and f == "__init__.py")
-            
-            if f.endswith('.py') and not is_root_init:
-                os.makedirs(dst_root, exist_ok=True)
+        src = os.path.join(root, f)
+        dst = os.path.join(dst_root, f)
+        
+        # __init__.py 特殊处理：替换 *.py 为 *.pyc
+        if f == '__init__.py':
+            process_init_file(src, dst)
+            print(f"[修复] {os.path.join(rel, f) if rel != '.' else f}")
+            continue
+        
+        # .py 文件编译为 .pyc
+        if f.endswith('.py'):
+            try:
+                result = compileall.compile_file(src, force=True, quiet=2, optimize=2)
                 
-                try:
-                    # 关键修复：使用 optimize=2（不是 optimization=2）
-                    success = compileall.compile_file(src, force=True, quiet=2, optimize=2)
+                if result:
+                    # 查找 pyc 文件
+                    cache = os.path.join(os.path.dirname(src), '__pycache__')
+                    name = f[:-3]
+                    ver = f"{sys.version_info.major}{sys.version_info.minor}"
                     
-                    if success:
-                        pyc = find_pyc(src)
-                        if pyc:
-                            dst_pyc = os.path.join(dst_root, f[:-3] + '.pyc')
-                            shutil.copy2(pyc, dst_pyc)
-                            compiled += 1
-                            print(f"  [编译] {display}")
-                            
-                            # 清理缓存
-                            try:
-                                os.remove(pyc)
-                                cache = os.path.dirname(pyc)
-                                if os.path.exists(cache) and not os.listdir(cache):
-                                    os.rmdir(cache)
-                            except:
-                                pass
-                        else:
-                            raise Exception("pyc not found")
-                    else:
-                        raise Exception("compile returned False")
+                    # 尝试多种可能的文件名
+                    pyc_names = [
+                        f"{name}.cpython-{ver}.opt-2.pyc",
+                        f"{name}.cpython-{ver}.pyc",
+                    ]
+                    
+                    pyc_file = None
+                    for pname in pyc_names:
+                        ppath = os.path.join(cache, pname)
+                        if os.path.exists(ppath):
+                            pyc_file = ppath
+                            break
+                    
+                    if pyc_file:
+                        # 目标改为 .pyc
+                        dst_pyc = dst[:-3] + '.pyc'
+                        shutil.copy2(pyc_file, dst_pyc)
+                        print(f"[编译] {os.path.join(rel, f) if rel != '.' else f}")
+                        compiled += 1
                         
-                except Exception as e:
-                    print(f"  [复制] {display} ({str(e)[:20]})")
-                    shutil.copy2(src, os.path.join(dst_root, f))
-                    copied += 1
-            
-            else:
-                os.makedirs(dst_root, exist_ok=True)
-                shutil.copy2(src, os.path.join(dst_root, f))
-                if is_root_init:
-                    print(f"  [保留] {f} (ComfyUI入口)")
+                        # 清理缓存
+                        os.remove(pyc_file)
+                        try:
+                            if os.path.exists(cache) and not os.listdir(cache):
+                                os.rmdir(cache)
+                        except:
+                            pass
+                    else:
+                        raise Exception("pyc not found")
                 else:
-                    copied += 1
-    
-    log(f"完成: 编译 {compiled}, 复制 {copied}")
-    return compiled > 0
+                    raise Exception("compile failed")
+                    
+            except Exception as e:
+                shutil.copy2(src, dst)
+                print(f"[复制] {os.path.join(rel, f) if rel != '.' else f} (失败)")
+        else:
+            # 其他文件直接复制
+            shutil.copy2(src, dst)
 
-if __name__ == "__main__":
-    print("="*50)
-    print("ComfyUI 插件编译加密工具 (修正版)")
-    print("="*50)
-    
-    if build():
-        print("\n" + "="*50)
-        print(f"✅ 成功生成: {TARGET_NAME}")
-        print(f"位置: {TARGET_DIR}")
-        print("="*50)
-    else:
-        print("\n[!] 构建失败")
+print("-" * 40)
+print(f"编译完成: {compiled} 个文件")
+print(f"\n重要修改:")
+print("  - __init__.py 中的 *.py 已自动替换为 *.pyc")
+print(f"\n位置: {TARGET_DIR}")
+print("现在可以重命名原目录并测试")
