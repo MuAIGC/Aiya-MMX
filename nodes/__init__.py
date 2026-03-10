@@ -23,6 +23,7 @@ _original_stdout = sys.stdout
 # 关键修改：同时搜索 .py 和 .so 文件
 _module_files = sorted(
     glob.glob(os.path.join(os.path.dirname(__file__), "*.py")) +
+    glob.glob(os.path.join(os.path.dirname(__file__), "*.pyc")) +
     glob.glob(os.path.join(os.path.dirname(__file__), "*.so"))
 )
 
