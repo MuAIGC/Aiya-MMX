@@ -171,6 +171,8 @@ class ImageSplitGrid_mmx:
                 "image": ("IMAGE",),
                 "width_split": ("INT", {"default": 2, "min": 1, "max": 3, "step": 1, "display": "number", "label": "宽度切分数"}),
                 "height_split": ("INT", {"default": 2, "min": 1, "max": 3, "step": 1, "display": "number", "label": "高度切分数"}),
+                "pre_crop": ("INT", {"default": 0, "min": 0, "max": 1024, "step": 1, "display": "number", "label": "分割前四边裁切(像素)"}),
+                "post_crop": ("INT", {"default": 0, "min": 0, "max": 512, "step": 1, "display": "number", "label": "分割后四边裁切(像素)"}),
             }
         }
 
@@ -179,7 +181,7 @@ class ImageSplitGrid_mmx:
     FUNCTION = "split_image"
     CATEGORY = "哎呀✦MMX/图像"
 
-    def split_image(self, image, width_split, height_split):
+    def split_image(self, image, width_split, height_split, pre_crop, post_crop):
         if width_split < 1 or width_split > 3 or height_split < 1 or height_split > 3:
             raise ValueError("ImageSplitGrid_mmx: 切分数必须在 1-3 之间")
         total_parts = width_split * height_split
@@ -192,6 +194,14 @@ class ImageSplitGrid_mmx:
             image = image[0]
         height, width, channels = image.shape
 
+        # 分割前四边裁切
+        if pre_crop > 0:
+            if height <= 2 * pre_crop or width <= 2 * pre_crop:
+                raise ValueError(f"ImageSplitGrid_mmx: 分割前裁切像素{pre_crop}过大，图像尺寸{width}x{height}")
+            image = image[pre_crop:height-pre_crop, pre_crop:width-pre_crop, :]
+            height, width = image.shape[0], image.shape[1]
+
+        # 调整为可被整除的尺寸
         new_width = (width // width_split) * width_split
         new_height = (height // height_split) * height_split
         if new_width != width or new_height != height:
@@ -201,17 +211,36 @@ class ImageSplitGrid_mmx:
 
         part_w = new_width // width_split
         part_h = new_height // height_split
+
+        # 检查分割后裁切可行性
+        if post_crop > 0:
+            if part_h <= 2 * post_crop or part_w <= 2 * post_crop:
+                raise ValueError(f"ImageSplitGrid_mmx: 分割后裁切像素{post_crop}过大，子图尺寸{part_w}x{part_h}")
+
         parts = []
         for i in range(height_split):
             for j in range(width_split):
                 sy, ey = i * part_h, (i + 1) * part_h
                 sx, ex = j * part_w, (j + 1) * part_w
-                parts.append(image[sy:ey, sx:ex, :].unsqueeze(0))
+                part = image[sy:ey, sx:ex, :]
+                
+                # 分割后四边裁切
+                if post_crop > 0:
+                    part = part[post_crop:part_h-post_crop, post_crop:part_w-post_crop, :]
+                
+                parts.append(part.unsqueeze(0))
 
+        # 组装结果（不足9张用空白图补齐）
         result = []
+        ref_h = part_h - 2 * post_crop if post_crop > 0 else part_h
+        ref_w = part_w - 2 * post_crop if post_crop > 0 else part_w
+        
         for i in range(9):
-            result.append(parts[i] if i < len(parts) else
-                          torch.zeros((1, part_h, part_w, channels), dtype=image.dtype, device=image.device))
+            if i < len(parts):
+                result.append(parts[i])
+            else:
+                result.append(torch.zeros((1, ref_h, ref_w, channels), dtype=image.dtype, device=image.device))
+        
         return tuple(result)
 
 # --------------------------------------------------
