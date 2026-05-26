@@ -76,40 +76,6 @@
   <b>微信号 MMXaigc</b><br>
   <small>说明来由验证更快哦</small>
 </p>
-
----
-
-## 💖 赞助商 · 感谢投喂
-<p align="center"><i>排名不分先后，一起给项目续命 🎀</i></p>
-
-<table align="center" border="0" cellpadding="12" cellspacing="8" style="max-width:420px;">
-  <!-- 星海智算 -->
-  <tr>
-    <td align="center" style="border:1px solid #FFE0F0;border-radius:8px;padding:12px;">
-      <a href="https://spacehpc.com/user/register?inviteCode=46153274">
-        <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/starsea-2.png" width="320"/>
-      </a>
-      <br/><b><font color="#FF7EB9">星海智算</font></b>
-      <br/><small>专业高性能 GPU 云</small>
-    </td>
-  </tr>
-
-  <!-- DMXAPI -->
-  <tr>
-    <td align="center" style="border:1px solid #FFE0F0;border-radius:8px;padding:12px;">
-      <a href="https://www.dmxapi.cn/register?aff=LpUa">
-        <img src="https://github.com/MuAIGC/ComfyUI-Aiya-MMX/raw/main/web/DMXAPI.png" width="320"/>
-      </a>
-      <br/><b><font color="#FF7EB9">DMXAPI</font></b>
-      <br/><small>海外 6.8 折 · 国内 7.9 折</small>
-    </td>
-  </tr>
-</table>
-
-<p align="center">
-  <small>想成为赞助商？微信戳 <b>MMXaigc</b> 备注「赞助」即可～</small>
-</p>
-
 ---
 
 <p align="center">
