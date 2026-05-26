@@ -46,7 +46,7 @@ class Sora2_mmx:
         return {
             "required": {
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***************************"}),
-                "base_url": ("STRING", {"default": "https://ai.t8star.cn", "placeholder": "API 根地址"}),
+                "base_url": ("STRING", {"default": "http://api.muhub.top", "placeholder": "API 根地址"}),
                 "prompt": ("STRING", {"multiline": True, "default": "A cinematic shot of..."}),
                 "model": ("STRING", {"default": "sora-2", "placeholder": "sora-2 / sora-2-pro"}),  # ← 改为字符串输入
                 "aspect_ratio": (["16:9", "9:16"], {"default": "16:9"}),
