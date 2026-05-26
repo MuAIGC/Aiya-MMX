@@ -96,7 +96,7 @@ class GPTImageGenerate:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/generations "}),
+                "api_url": ("STRING", {"default": "http://api.muhub.top/v1/images/generations "}),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "model": ("STRING", {"default": "gpt-image-1.5", "placeholder": "gpt-image-1.5"}),
@@ -290,7 +290,7 @@ class GPTImageEdit:
         
         return {
             "required": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/edits "}),
+                "api_url": ("STRING", {"default": "http://api.muhub.top/v1/images/edits "}),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"multiline": True, "default": "给人物添加一副墨镜，保持风格一致"}),
                 "model": ("STRING", {"default": "gpt-image-1.5"}),
@@ -476,7 +476,7 @@ class GPTImageEditSubmit:
         optional_inputs = {f"reference_image_{i}": ("IMAGE",) for i in range(1, 17)}
         return {
             "required": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/images/edits "}),
+                "api_url": ("STRING", {"default": "http://api.muhub.top/v1/images/edits "}),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
                 "prompt": ("STRING", {"multiline": True, "default": ""}),
                 "model": ("STRING", {"default": "gpt-image-1.5"}),
@@ -854,7 +854,7 @@ class SVG_Generate_Save_mmx:
         return {
             "required": {
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/chat/completions"}),
+                "api_url": ("STRING", {"default": "http://api.muhub.top/v1/chat/completions"}),
                 "prompt": ("STRING", {"multiline": True, "default": "生成一个极简科技动画，蓝色渐变"}),
                 "model": ("STRING", {"default": "gemini-3-flash-preview"}),
                 "filename_prefix": ("STRING", {"default": "svg_output"}),
