@@ -42,7 +42,7 @@ class NanoBananaPro:
         return {
             "required": {
                 "endpoint_url": ("STRING", {
-                    "default": "https://ai.t8star.cn/v1/images/generations",
+                    "default": "http://api.muhub.top/v1/images/generations",
                     "placeholder": "https://xxx/v1/images/generations"
                 }),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
@@ -142,7 +142,7 @@ class NanoBananaProSubmit:
         return {
             "required": {
                 "endpoint_url": ("STRING", {
-                    "default": "https://ai.t8star.cn/v1/images/generations",
+                    "default": "http://api.muhub.top/v1/images/generations",
                     "placeholder": "https://xxx/v1/images/generations"
                 }),
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***"}),
@@ -280,7 +280,7 @@ class Gemini3Vision:
                 "model": ("STRING", {"default": "gemini-3-flash-preview"}),
             },
             "optional": {
-                "api_url": ("STRING", {"default": "https://ai.t8star.cn/v1/chat/completions"}),
+                "api_url": ("STRING", {"default": "http://api.muhub.top/v1/chat/completions"}),
                 "image": ("IMAGE",),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 2147483647}),
                 "max_tokens": ("INT", {"default": 4096, "min": 1, "max": 8192}),
@@ -387,7 +387,7 @@ class Veo3_1:
         return {
             "required": {
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***************************"}),
-                "base_url": ("STRING", {"default": "https://ai.t8star.cn", "placeholder": "API 根地址"}),
+                "base_url": ("STRING", {"default": "http://api.muhub.top", "placeholder": "API 根地址"}),
                 "prompt": ("STRING", {"multiline": True, "default": "A cinematic aerial shot of a neon-lit cyberpunk city at night, 4K, ultra detailed"}),
                 "model": ("STRING", {"default": "veo3.1", "placeholder": "veo3.1 / veo3.1-fast / veo3.1-pro / ..."}),
                 "duration": (["5", "10", "15", "20", "25"], {"default": "10"}),
@@ -521,7 +521,7 @@ class Veo3_1_Submit:
         return {
             "required": {
                 "api_key": ("STRING", {"default": "", "placeholder": "sk-***************************"}),
-                "base_url": ("STRING", {"default": "https://ai.t8star.cn", "placeholder": "API 根地址"}),
+                "base_url": ("STRING", {"default": "http://api.muhub.top", "placeholder": "API 根地址"}),
                 "prompt": ("STRING", {"multiline": True, "default": "A cinematic aerial shot of a neon-lit cyberpunk city at night, 4K, ultra detailed"}),
                 "model": ("STRING", {"default": "veo3.1", "placeholder": "veo3.1 / veo3.1-fast / ..."}),
                 "duration": (["5", "10", "15", "20", "25"], {"default": "10"}),
