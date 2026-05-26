@@ -16,7 +16,42 @@ from ..register import register_node
 from ..mmx_utils import pil2tensor, tensor2pil
 
 
-_SIZE_PRESETS = ["1K", "2K", "4K"]
+# 比例 × K值 → "宽x高"
+# K = 长边像素，宽高须为16的倍数，宽高比 1:8 ~ 8:1
+# 万相：1K≈1024², 2K≈2048², 4K≈4096²
+_RES = {
+    # 比例     1K         2K          4K
+    ("1", "1"):   ("1024x1024", "2048x2048", "4096x4096"),
+    ("16", "9"):  ("1024x576",  "2048x1152",  "4096x2304"),
+    ("9", "16"):  ("576x1024",  "1152x2048",  "2304x4096"),
+    ("3", "2"):   ("1024x684",  "2048x1364",  "4096x2732"),
+    ("2", "3"):   ("684x1024",  "1364x2048",  "2732x4096"),
+    ("4", "3"):   ("1024x768",  "2048x1536",  "4096x3072"),
+    ("3", "4"):   ("768x1024",  "1536x2048",  "3072x4096"),
+    ("5", "4"):   ("1024x820",  "2048x1638",  "4096x3276"),
+    ("4", "5"):   ("820x1024",  "1638x2048",  "3276x4096"),
+    ("21", "9"):  ("1024x440",  "2048x878",   "4096x1756"),
+    ("9", "21"):  ("440x1024",  "878x2048",   "1756x4096"),
+    ("7", "3"):   ("1024x440",  "2048x878",   "4096x1756"),
+    ("3", "7"):   ("440x1024",  "878x2048",   "1756x4096"),
+    ("5", "3"):   ("1024x614",  "2048x1228",  "4096x2458"),
+    ("3", "5"):   ("614x1024",  "1228x2048",  "2458x4096"),
+    ("11", "4"):  ("1024x372",  "2048x744",   "4096x1490"),
+    ("4", "11"):  ("372x1024",  "744x2048",   "1490x4096"),
+    ("13", "4"):  ("1024x316",  "2048x628",   "4096x1256"),
+    ("4", "13"):  ("316x1024",  "628x2048",   "1256x4096"),
+    ("8", "1"):   ("1024x128",  "2048x256",   "4096x512"),
+    ("1", "8"):   ("128x1024",  "256x2048",   "512x4096"),
+}
+
+_ASPECT_RATIOS = [
+    "1:1", "16:9", "9:16", "3:2", "2:3", "4:3", "3:4",
+    "5:4", "4:5", "21:9", "9:21", "7:3", "3:7",
+    "5:3", "3:5", "11:4", "4:11", "13:4", "4:13",
+    "8:1", "1:8"
+]
+_K_LABELS = ["1K (~1024)", "2K (~2048)", "4K (~4096)"]
+_K_MAP = {"1K (~1024)": 0, "2K (~2048)": 1, "4K (~4096)": 2}
 _MAX_IMAGES = 9
 
 
@@ -48,29 +83,34 @@ def _empty(h=1024, w=1024):
     return torch.zeros(1, h, w, 3)
 
 
-def _resolve_size(size_mode, size_preset, cw, ch, has_images, enable_sequential, model):
+def _resolve_size(aspect_ratio, resolution, has_images, enable_sequential, model):
+    """比例 + K值 → (size_str, warning_or_none)"""
     is_pro = "wan2.7-image-pro" in model
-    max_total = 4096*4096 if (is_pro and not has_images and not enable_sequential) else 2048*2048
+    k_idx = _K_MAP.get(resolution, 1)  # default 2K
 
-    if size_mode == "preset":
-        val = size_preset
-        warn = None
-        if val == "4K":
-            if has_images or enable_sequential:
-                val, warn = "2K", "⚠️ 编辑/组图不支持4K，已降级到2K"
-            elif not is_pro:
-                val, warn = "2K", "⚠️ 该模型不支持4K，已降级到2K"
-        return val, warn
+    # 4K 限制
+    if k_idx == 2:  # 4K
+        if has_images or enable_sequential:
+            k_idx = 1  # 降级2K
+        elif not is_pro:
+            k_idx = 1
+            # fall through to warn below
 
-    total = cw * ch
-    ratio = cw / ch if ch > 0 else 1
-    if ratio < 0.125 or ratio > 8:
-        return None, f"宽高比 {ratio:.2f} 超出 [1:8, 8:1]"
-    if total < 768*768:
-        return None, f"总像素 {total} 低于 768×768"
-    if total > max_total:
-        return None, f"总像素 {total} 超过 {max_total}"
-    return f"{cw}x{ch}", None
+    w, h = aspect_ratio.split(":")
+    key = (w.strip(), h.strip())
+    if key not in _RES:
+        return "2K", f"⚠️ 未知比例 {aspect_ratio}，使用 2K"
+
+    size_str = _RES[key][k_idx]
+
+    # 4K 降级警告
+    if k_idx == 1 and resolution == "4K (~4096)":
+        if has_images or enable_sequential:
+            return size_str, "⚠️ 编辑/组图不支持4K，已降级到2K"
+        elif not is_pro:
+            return size_str, "⚠️ 该模型不支持4K，已降级到2K"
+
+    return size_str, None
 
 
 # ===================================================================
@@ -102,24 +142,19 @@ class Wan27_Image:
                     "multiline": True, "default": "",
                     "tooltip": "图像描述，支持中英文，长度不超过5000字符"
                 }),
-                "size_mode": (["preset", "custom"], {
-                    "default": "preset",
-                    "tooltip": "分辨率指定方式：preset=预设1K/2K/4K，custom=自定义宽×高"
+                "aspect_ratio": (_ASPECT_RATIOS, {
+                    "default": "1:1",
+                    "tooltip": (
+                        "画面比例。21种预设含极限比例 8:1/1:8\n"
+                        "K值决定具体分辨率，1K=长边1024，2K=2048，4K=4096"
+                    )
                 }),
-                "size_preset": (_SIZE_PRESETS, {
-                    "default": "2K",
-                    "tooltip": "1K≈1024², 2K≈2048², 4K≈4096²（仅wan2.7-image-pro文生图）"
+                "resolution": (_K_LABELS, {
+                    "default": "2K (~2048)",
+                    "tooltip": "分辨率等级：1K=长边1024，2K=2048，4K=4096（仅wan2.7-image-pro文生图）"
                 }),
             },
             "optional": {
-                "custom_width": ("INT", {
-                    "default": 1920, "min": 240, "max": 8000,
-                    "tooltip": "自定义宽度像素"
-                }),
-                "custom_height": ("INT", {
-                    "default": 1080, "min": 240, "max": 8000,
-                    "tooltip": "自定义高度像素，宽高比须满足 [1:8, 8:1]"
-                }),
                 "n": ("INT", {
                     "default": 1, "min": 1, "max": 12,
                     "tooltip": "生成数量：普通1-4，组图1-12"
@@ -164,8 +199,7 @@ class Wan27_Image:
     OUTPUT_NODE = True
 
     def run(self, base_url, api_key, model, prompt,
-            size_mode="preset", size_preset="2K",
-            custom_width=1920, custom_height=1080,
+            aspect_ratio="1:1", resolution="2K (~2048)",
             n=1, watermark=False, thinking_mode=True, seed=0,
             enable_sequential=False, timeout=120, retries=2, extra_json="",
             **img_ports):
@@ -190,8 +224,7 @@ class Wan27_Image:
 
         is_pro = "wan2.7-image-pro" in model
         size_val, size_warn = _resolve_size(
-            size_mode, size_preset, custom_width, custom_height,
-            has_images, enable_sequential, model
+            aspect_ratio, resolution, has_images, enable_sequential, model
         )
         if size_warn:
             print(f"[Wan2.7] {size_warn}")
