@@ -112,8 +112,11 @@ class save2JPG_mmx:
         texts = []
         for node in prompt.values():
             if isinstance(node, dict) and isinstance(node.get("inputs"), dict):
-                t = block:
-            return "\n".join(texts)
+                t = node["inputs"].get("prompt")
+                if isinstance(t, str) and t.strip():
+                    texts.append(t.strip())
+        return "\n".join(texts)
+
 
 # --------------------------------------------------
 #  3. 路径读图  LoadImageFromPath_mmx
