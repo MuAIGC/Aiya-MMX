@@ -87,6 +87,14 @@ class save2JPG_mmx:
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+            # === 修复：JPEG 不支持透明通道，RGBA/LA/P 模式先转为 RGB（白底） ===
+            if img.mode in ('RGBA', 'LA', 'P'):
+                img = img.convert('RGBA')
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                background.paste(img, mask=img.split()[3])
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
             file = f"{filename}_{counter:05}_.jpg"
             save_path = os.path.join(full_output_folder, file)
             img.save(save_path, format='JPEG', quality=quality, optimize=optimize, progressive=progressive)
@@ -104,10 +112,8 @@ class save2JPG_mmx:
         texts = []
         for node in prompt.values():
             if isinstance(node, dict) and isinstance(node.get("inputs"), dict):
-                t = node["inputs"].get("prompt")
-                if isinstance(t, str) and t.strip():
-                    texts.append(t.strip())
-        return "\n".join(texts)
+                t = block:
+            return "\n".join(texts)
 
 # --------------------------------------------------
 #  3. 路径读图  LoadImageFromPath_mmx
